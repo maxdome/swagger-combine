@@ -1,0 +1,47 @@
+{
+  "name": "swagger-combine",
+  "version": "0.1.0",
+  "description": "Combines multiple Swagger configurations into one dereferenced schema",
+  "main": "src/swagger-combine.js",
+  "scripts": {
+    "test": "npm run lint",
+    "lint": "eslint **/*.js"
+  },
+  "keywords": [
+    "swagger",
+    "combine",
+    "merge",
+    "api",
+    "documentation"
+  ],
+  "author": {
+    "name": "Maxdome",
+    "url": "https://www.maxdome.de"
+  },
+  "contributors": [
+    {
+      "name": "Fabian Schneider",
+      "email": "fabian.schneider@maxdome.de"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxdome/swagger-combine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maxdome/swagger-combine/issues"
+  },
+  "homepage": "https://github.com/maxdome/swagger-combine#readme",
+  "license": "MIT",
+  "dependencies": {
+    "json-schema-ref-parser": "^3.1.2",
+    "lodash": "^4.17.4",
+    "swagger-parser": "^3.4.1",
+    "traverse": "^0.6.6"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-maxdome": "^2.0.0",
+    "eslint-plugin-import": "^2.2.0"
+  }
+}

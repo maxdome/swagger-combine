@@ -1,0 +1,6 @@
+{
+  "extends": "maxdome/node",
+  "rules": {
+    "no-console": 0
+  }
+}
