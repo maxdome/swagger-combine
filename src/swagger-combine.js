@@ -8,7 +8,7 @@ function swaggerCombine(config = 'config/swagger.json', cb) {
   let combinedSchema;
   let apis;
 
-  return maybe(cb, $RefParser.parse(config)
+  return maybe(cb, $RefParser.dereference(config)
     .then((configSchema) => {
       apis = configSchema.apis;
       combinedSchema = _.omit(configSchema, 'apis');
