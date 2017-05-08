@@ -3,7 +3,7 @@ const SwaggerParser = require('swagger-parser');
 const traverse = require('traverse');
 const _ = require('lodash');
 
-module.exports = (config = 'config/swagger.json') => {
+function swaggerCombine(config = 'config/swagger.json') {
   let combinedSchema;
   let apis;
 
@@ -93,4 +93,12 @@ module.exports = (config = 'config/swagger.json') => {
 
       return combinedSchema;
     });
+}
+
+swaggerCombine.middleware = config => (req, res, next) => {
+  swaggerCombine(config)
+    .then(combinedSchema => res.send(combinedSchema))
+    .catch(err => next(err));
 };
+
+module.exports = swaggerCombine;

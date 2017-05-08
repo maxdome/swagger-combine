@@ -1,6 +1,6 @@
 {
   "name": "swagger-combine",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Combines multiple Swagger configurations into one dereferenced schema",
   "main": "src/swagger-combine.js",
   "scripts": {
@@ -42,6 +42,10 @@
   "devDependencies": {
     "eslint": "^3.19.0",
     "eslint-config-maxdome": "^2.0.0",
-    "eslint-plugin-import": "^2.2.0"
+    "eslint-plugin-import": "^2.2.0",
+    "express": "^4.15.2"
+  },
+  "directories": {
+   "example": "examples"
   }
 }

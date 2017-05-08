@@ -15,14 +15,26 @@ $ npm install --save swagger-combine
 const swaggerCombine = require('swagger-combine');
 
 swaggerCombine('config/swagger.json')
-    .then(combinedSchema => console.log(combinedSchema))
+    .then(combinedSchema => console.log(JSON.stringify(combinedSchema)))
     .catch(err => console.error(err));
 ```
+
+### Middleware
+
+```js
+const swaggerCombine = require('swagger-combine');
+const app = require('express')();
+
+app.get('/swagger.json', swaggerCombine.middleware('config/swagger.json'));
+app.listen(3333);
+```
+
+The middleware runs the combine function on every request. Since swagger documentations tend not to change that frequently, the use of a caching mechanism like [apicache](https://github.com/kwhitley/apicache) is encouraged in conjungtion with this middleware.
 
 ## Configuration
 
 **swagger-combine** requires one configuration schema which resembles a standard swagger schema except for an additional `apis` field. The default path for this file is `config/swagger.json`.
-The schema can be passed to **swagger-combine** as a file path, an URL or a JS object.
+The schema can be passed to **swagger-combine** as a file path, a URL or a JS object.
 
 ### Basic Configuration
 
