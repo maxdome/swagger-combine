@@ -19,6 +19,16 @@ swaggerCombine('config/swagger.json')
     .catch(err => console.error(err));
 ```
 
+**swagger-combine** returns a promise by default. Alternatively a callback can be passed as second argument:
+
+```js
+swaggerCombine('config/swagger.json', (err, res) => {
+  if (err) console.error(err);
+
+  console.log(JSON.stringify(res));
+});
+```
+
 ### Middleware
 
 ```js

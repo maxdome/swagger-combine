@@ -19,3 +19,12 @@ const config = {
 swaggerCombine(config)
   .then(res => console.log(JSON.stringify(res, false, 2)))
   .catch(err => console.error(err));
+
+/* Using a callback */
+// swaggerCombine(config, (err, res) => {
+//   if (err) {
+//     console.error(err);
+//   }
+//
+//   console.log(JSON.stringify(res, false, 2));
+// });

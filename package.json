@@ -1,6 +1,6 @@
 {
   "name": "swagger-combine",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Combines multiple Swagger configurations into one dereferenced schema",
   "main": "src/swagger-combine.js",
   "scripts": {
@@ -34,6 +34,7 @@
   "homepage": "https://github.com/maxdome/swagger-combine#readme",
   "license": "MIT",
   "dependencies": {
+    "call-me-maybe": "^1.0.1",
     "json-schema-ref-parser": "^3.1.2",
     "lodash": "^4.17.4",
     "swagger-parser": "^3.4.1",
@@ -46,6 +47,6 @@
     "express": "^4.15.2"
   },
   "directories": {
-   "example": "examples"
+    "example": "examples"
   }
 }

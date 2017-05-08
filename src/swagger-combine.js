@@ -1,13 +1,14 @@
 const $RefParser = require('json-schema-ref-parser');
 const SwaggerParser = require('swagger-parser');
+const maybe = require('call-me-maybe');
 const traverse = require('traverse');
 const _ = require('lodash');
 
-function swaggerCombine(config = 'config/swagger.json') {
+function swaggerCombine(config = 'config/swagger.json', cb) {
   let combinedSchema;
   let apis;
 
-  return $RefParser.parse(config)
+  return maybe(cb, $RefParser.parse(config)
     .then((configSchema) => {
       apis = configSchema.apis;
       combinedSchema = _.omit(configSchema, 'apis');
@@ -92,7 +93,8 @@ function swaggerCombine(config = 'config/swagger.json') {
       });
 
       return combinedSchema;
-    });
+    })
+  );
 }
 
 swaggerCombine.middleware = config => (req, res, next) => {
