@@ -18,5 +18,7 @@ const config = {
 };
 
 app.get('/swagger.json', swaggerCombine.middleware(config));
+app.get('/swagger.yaml', swaggerCombine.middleware(config, { format: 'yaml' }));
+app.use((err, req, res, next) => console.error(err));
 
 app.listen(3333);

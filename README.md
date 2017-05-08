@@ -36,6 +36,7 @@ const swaggerCombine = require('swagger-combine');
 const app = require('express')();
 
 app.get('/swagger.json', swaggerCombine.middleware('config/swagger.json'));
+app.get('/swagger.yaml', swaggerCombine.middleware('config/swagger.json', { format: 'yaml' }));
 app.listen(3333);
 ```
 

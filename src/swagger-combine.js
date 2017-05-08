@@ -97,9 +97,15 @@ function swaggerCombine(config = 'config/swagger.json', cb) {
   );
 }
 
-swaggerCombine.middleware = config => (req, res, next) => {
+swaggerCombine.middleware = (config, opts = {}) => (req, res, next) => {
   swaggerCombine(config)
-    .then(combinedSchema => res.send(combinedSchema))
+    .then(combinedSchema => {
+      if (opts && (opts.format === 'yaml' || opts.format === 'yml')) {
+        return res.type('yaml').send($RefParser.YAML.stringify(combinedSchema));
+      }
+
+      res.json(combinedSchema)
+    })
     .catch(err => next(err));
 };
 
