@@ -4,7 +4,7 @@ const maybe = require('call-me-maybe');
 const traverse = require('traverse');
 const _ = require('lodash');
 
-function swaggerCombine(config = 'config/swagger.json', cb) {
+function swaggerCombine(config = 'docs/swagger.json', cb) {
   let combinedSchema;
   let apis;
 

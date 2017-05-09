@@ -13,6 +13,9 @@ const config = {
         security: {
           '/store/order': {
             petstore_auth: ['write:pets', 'read:pets']
+          },
+          '/store/order/{orderId}.delete': {
+            petstore_auth: ['write:pets', 'read:pets']
           }
         }
       }

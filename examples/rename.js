@@ -3,7 +3,7 @@ const swaggerCombine = require('../src/swagger-combine');
 const config = {
   swagger: '2.0',
   info: {
-    title: 'Swagger Combine Replacing Example',
+    title: 'Swagger Combine Rename Example',
     version: '1.0.0'
   },
   apis: [

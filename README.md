@@ -1,7 +1,7 @@
 Swagger Combine
 ===============
 
-Combines multiple Swagger configurations into one dereferenced schema.
+Combines multiple Swagger schemas into one dereferenced schema.
 
 ## Install
 
@@ -14,15 +14,15 @@ $ npm install --save swagger-combine
 ```js
 const swaggerCombine = require('swagger-combine');
 
-swaggerCombine('config/swagger.json')
+swaggerCombine('docs/swagger.json')
     .then(combinedSchema => console.log(JSON.stringify(combinedSchema)))
     .catch(err => console.error(err));
 ```
 
-**swagger-combine** returns a promise by default. Alternatively a callback can be passed as second argument:
+**Swagger Combine** returns a promise by default. Alternatively a callback can be passed as second argument:
 
 ```js
-swaggerCombine('config/swagger.json', (err, res) => {
+swaggerCombine('docs/swagger.json', (err, res) => {
   if (err) console.error(err);
 
   console.log(JSON.stringify(res));
@@ -35,17 +35,20 @@ swaggerCombine('config/swagger.json', (err, res) => {
 const swaggerCombine = require('swagger-combine');
 const app = require('express')();
 
-app.get('/swagger.json', swaggerCombine.middleware('config/swagger.json'));
-app.get('/swagger.yaml', swaggerCombine.middleware('config/swagger.json', { format: 'yaml' }));
+app.get('/swagger.json', swaggerCombine.middleware('docs/swagger.json'));
+app.get('/swagger.yaml', swaggerCombine.middleware('docs/swagger.json', { format: 'yaml' }));
 app.listen(3333);
 ```
 
-The middleware runs the combine function on every request. Since swagger documentations tend not to change that frequently, the use of a caching mechanism like [apicache](https://github.com/kwhitley/apicache) is encouraged in conjungtion with this middleware.
+The middleware runs the combine function on every request. Since Swagger documentations tend not to change that frequently, the use of a caching mechanism like [apicache](https://github.com/kwhitley/apicache) is encouraged in conjungtion with this middleware.
 
 ## Configuration
 
-**swagger-combine** requires one configuration schema which resembles a standard swagger schema except for an additional `apis` field. The default path for this file is `config/swagger.json`.
-The schema can be passed to **swagger-combine** as a file path, a URL or a JS object.
+* **Swagger Combine** requires one configuration schema which resembles a standard Swagger schema except for an additional `apis` field.
+* Since this module uses [Swagger Parser](https://github.com/BigstickCarpet/swagger-parser) and [JSON Schema $Ref Parser](https://github.com/BigstickCarpet/json-schema-ref-parser) internally the schema can be passed to **Swagger Combine** as a file path, a URL or a JS object.
+* All `$ref` fields in the configuration schema are getting dereferenced. 
+* The default path for the configuration file is `docs/swagger.json`.
+* The configuration file can be `JSON` or `YAML`.
 
 ### Basic Configuration
 
@@ -100,7 +103,8 @@ Paths can be filtered by using an array of paths to `exclude` or `include`.
       "url": "http://petstore.swagger.io/v2/swagger.json",
       "paths": {
         "exclude": [
-          "/pet/{petId}"
+          "/pet/{petId}",
+          "/pet.put"
         ]
       }
     },
@@ -108,7 +112,8 @@ Paths can be filtered by using an array of paths to `exclude` or `include`.
       "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml",
       "paths": {
         "include": [
-          "/users/{userId}/publications"
+          "/users/{userId}/publications",
+          "/me.get"
         ]
       }
     }
@@ -191,6 +196,12 @@ Security can be specified per path using the `paths.security` field.
               "write:pets",
               "read:pets"
             ]
+          },
+          "/store/order/{orderId}.delete": {
+            "petstore_auth": [
+               "write:pets",
+               "read:pets"
+             ]
           }
         }
       }
