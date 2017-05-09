@@ -88,9 +88,14 @@ function swaggerCombine(config = 'config/swagger.json', cb) {
   function combineSchemas(schemas) {
     schemas.forEach((schema, idx) => {
       const conflictingPaths = _.intersection(_.keys(combinedSchema.paths), _.keys(schema.paths));
+      const conflictingSecurityDefs = _.intersection(_.keys(combinedSchema.securityDefinitions), _.keys(schema.securityDefinitions));
 
       if (!_.isEmpty(conflictingPaths)) {
         throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')}`);
+      }
+
+      if (!_.isEmpty(conflictingSecurityDefs)) {
+        throw new Error(`Name conflict in security definitions: ${conflictingSecurityDefs.join(', ')}`);
       }
 
       _.defaultsDeep(combinedSchema, _.pick(schema, ['paths', 'securityDefinitions']));
