@@ -95,7 +95,7 @@ Paths can be filtered by using an array of paths to `exclude` or `include`.
 {
   "swagger": "2.0",
   "info": {
-    "title": "Swagger Combine Filtering Example",
+    "title": "Swagger Combine Filter Example",
     "version": "1.0.0"
   },
   "apis": [
@@ -129,7 +129,7 @@ Paths can be renamed by specifying the path to rename and the new path name as k
 {
   "swagger": "2.0",
   "info": {
-    "title": "Swagger Combine Replacing Example",
+    "title": "Swagger Combine Rename Example",
     "version": "1.0.0"
   },
   "apis": [
@@ -156,7 +156,7 @@ Tags can be renamed in the same manner as paths, using the `tags.rename` field.
 {
   "swagger": "2.0",
   "info": {
-    "title": "Swagger Combine Replacing Example",
+    "title": "Swagger Combine Rename Example",
     "version": "1.0.0"
   },
   "apis": [
