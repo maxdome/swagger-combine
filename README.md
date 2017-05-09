@@ -116,9 +116,9 @@ Paths can be filtered by using an array of paths to `exclude` or `include`.
 }
 ```
 
-### Replacing Paths
+### Renaming Paths
 
-Paths can be replaced by specifying the path to replace and the replacement path as key/value pairs in `paths.replace`.
+Paths can be renamed by specifying the path to rename and the new path name as key/value pairs in `paths.rename`.
 
 ```json
 {
@@ -131,7 +131,7 @@ Paths can be replaced by specifying the path to replace and the replacement path
     {
       "url": "http://petstore.swagger.io/v2/swagger.json",
       "paths": {
-        "replace": {
+        "rename": {
           "/pet/{petId}": "/pet/alive/{petId}"
         }
       }
@@ -143,9 +143,9 @@ Paths can be replaced by specifying the path to replace and the replacement path
 }
 ```
 
-### Replacing Tags
+### Renaming Tags
 
-Tags can be replaced in the same manner as paths, using the `tags.replace` field.
+Tags can be renamed in the same manner as paths, using the `tags.rename` field.
 
 ```json
 {
@@ -161,7 +161,7 @@ Tags can be replaced in the same manner as paths, using the `tags.replace` field
     {
       "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml",
       "tags": {
-        "replace": {
+        "rename": {
           "Users": "People"
         }
       }

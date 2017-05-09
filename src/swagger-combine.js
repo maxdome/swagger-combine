@@ -22,13 +22,13 @@ function swaggerCombine(config = 'config/swagger.json', cb) {
     });
   }
 
-  function replacePaths(schemas) {
+  function renamePaths(schemas) {
     return schemas.map((schema, idx) => {
-      if (apis[idx].paths && apis[idx].paths.replace && Object.keys(apis[idx].paths.replace).length > 0) {
-        _.forIn(apis[idx].paths.replace, (replacePath, pathToReplace) => {
+      if (apis[idx].paths && apis[idx].paths.rename && Object.keys(apis[idx].paths.rename).length > 0) {
+        _.forIn(apis[idx].paths.rename, (renamePath, pathToRename) => {
           schema.paths = _.mapKeys(schema.paths, (value, curPath) => {
-            if (pathToReplace === curPath) {
-              return replacePath;
+            if (pathToRename === curPath) {
+              return renamePath;
             }
 
             return curPath;
@@ -69,13 +69,13 @@ function swaggerCombine(config = 'config/swagger.json', cb) {
     });
   }
 
-  function replaceTags(schemas) {
+  function renameTags(schemas) {
     return schemas.map((schema, idx) => {
-      if (apis[idx].tags && apis[idx].tags.replace && Object.keys(apis[idx].tags.replace).length > 0) {
-        _.forIn(apis[idx].tags.replace, (replaceTag, tagToReplace) => {
+      if (apis[idx].tags && apis[idx].tags.rename && Object.keys(apis[idx].tags.rename).length > 0) {
+        _.forIn(apis[idx].tags.rename, (newTagName, tagNameToRename) => {
           traverse(schema).forEach((function traverseSchema() {
-            if (this.key === 'tags' && Array.isArray(this.node) && this.node.includes(tagToReplace)) {
-              this.update(this.node.map(tag => tag === tagToReplace ? replaceTag : tag)); // eslint-disable-line
+            if (this.key === 'tags' && Array.isArray(this.node) && this.node.includes(tagNameToRename)) {
+              this.update(this.node.map(tag => tag === tagNameToRename ? newTagName : tag)); // eslint-disable-line
             }
           }));
         });
@@ -116,9 +116,9 @@ function swaggerCombine(config = 'config/swagger.json', cb) {
       return Promise.all(apis.map(api => SwaggerParser.dereference(api.url)));
     })
     .then(filterPaths)
-    .then(replacePaths)
+    .then(renamePaths)
     .then(addSecurityToPaths)
-    .then(replaceTags)
+    .then(renameTags)
     .then(combineSchemas)
     .then(removeEmptyFields)
   );

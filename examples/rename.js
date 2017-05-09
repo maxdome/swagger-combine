@@ -10,7 +10,7 @@ const config = {
     {
       url: 'http://petstore.swagger.io/v2/swagger.json',
       paths: {
-        replace: {
+        rename: {
           '/pet/{petId}': '/pet/alive/{petId}'
         }
       }
@@ -18,7 +18,7 @@ const config = {
     {
       url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml',
       tags: {
-        replace: {
+        rename: {
           Users: 'People'
         }
       }
