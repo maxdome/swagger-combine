@@ -11,10 +11,10 @@ function swaggerCombine(config = 'config/swagger.json', cb) {
   function filterPaths(schemas) {
     return schemas.map((schema, idx) => {
       if (apis[idx].paths) {
-        if (apis[idx].paths.exclude && apis[idx].paths.exclude.length > 0) {
-          schema.paths = _.omit(schema.paths, apis[idx].paths.exclude);
-        } else if (apis[idx].paths.include && apis[idx].paths.include.length > 0) {
+        if (apis[idx].paths.include && apis[idx].paths.include.length > 0) {
           schema.paths = _.pick(schema.paths, apis[idx].paths.include);
+        } else if (apis[idx].paths.exclude && apis[idx].paths.exclude.length > 0) {
+          schema.paths = _.omit(schema.paths, apis[idx].paths.exclude);
         }
       }
 
@@ -44,21 +44,21 @@ function swaggerCombine(config = 'config/swagger.json', cb) {
     return schemas.map((schema, idx) => {
       if (apis[idx].paths && apis[idx].paths.security && Object.keys(apis[idx].paths.security).length > 0) {
         _.forIn(apis[idx].paths.security, (securityDefinitions, pathForSecurity) => {
-          const pathComponents = pathForSecurity.split('.');
+          const hasHttpMethod = /\.(get|put|post|delete|options|head|patch)$/i.test(pathForSecurity);
           const pathInSchema = _.get(schema.paths, pathForSecurity);
 
           if (pathInSchema) {
-            if (pathComponents.length === 1) {
+            if (hasHttpMethod) {
+              _.forIn(securityDefinitions, (scope, type) => {
+                pathInSchema.security = pathInSchema.security || [];
+                pathInSchema.security.push({ [type]: scope });
+              });
+            } else {
               _.forIn(pathInSchema, (properties, method) => {
                 _.forIn(securityDefinitions, (scope, type) => {
                   pathInSchema[method].security = pathInSchema[method].security || [];
                   pathInSchema[method].security.push({ [type]: scope });
                 });
-              });
-            } else if (pathComponents.length === 2) {
-              _.forIn(securityDefinitions, (scope, type) => {
-                pathInSchema.security = pathInSchema.security || [];
-                pathInSchema.security.push({ [type]: scope });
               });
             }
           }
