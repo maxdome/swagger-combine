@@ -105,7 +105,7 @@ function swaggerCombine(config = 'docs/swagger.json', cb) {
   }
 
   function removeEmptyFields(combinedSchema) {
-    return _(combinedSchema).omitBy(_.isNil).omitBy(_.isEmpty);
+    return _(combinedSchema).omitBy(_.isNil).omitBy(_.isEmpty).value();
   }
 
   return maybe(cb, $RefParser.dereference(config)
