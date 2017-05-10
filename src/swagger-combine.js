@@ -4,9 +4,14 @@ const maybe = require('call-me-maybe');
 const traverse = require('traverse');
 const _ = require('lodash');
 
-function swaggerCombine(config = 'docs/swagger.json', cb) {
+function swaggerCombine(config = 'docs/swagger.json', opts, cb) {
   let combinedSchema;
   let apis;
+
+  if (_.isFunction(opts)) {
+    cb = opts;
+    opts = null;
+  }
 
   function filterPaths(schemas) {
     return schemas.map((schema, idx) => {
@@ -37,7 +42,7 @@ function swaggerCombine(config = 'docs/swagger.json', cb) {
       }
 
       return schema;
-    })
+    });
   }
 
   function addSecurityToPaths(schemas) {
@@ -104,16 +109,16 @@ function swaggerCombine(config = 'docs/swagger.json', cb) {
     return combinedSchema;
   }
 
-  function removeEmptyFields(combinedSchema) {
-    return _(combinedSchema).omitBy(_.isNil).omitBy(_.isEmpty).value();
+  function removeEmptyFields(schema) {
+    return _(schema).omitBy(_.isNil).omitBy(_.isEmpty).value();
   }
 
-  return maybe(cb, $RefParser.dereference(config)
+  return maybe(cb, $RefParser.dereference(config, opts)
     .then((configSchema) => {
       apis = configSchema.apis;
       combinedSchema = _.omit(configSchema, 'apis');
 
-      return Promise.all(apis.map(api => SwaggerParser.dereference(api.url)));
+      return Promise.all(apis.map(api => SwaggerParser.dereference(api.url, opts)));
     })
     .then(filterPaths)
     .then(renamePaths)
@@ -125,13 +130,13 @@ function swaggerCombine(config = 'docs/swagger.json', cb) {
 }
 
 swaggerCombine.middleware = (config, opts = {}) => (req, res, next) => {
-  swaggerCombine(config)
-    .then(combinedSchema => {
+  swaggerCombine(config, opts)
+    .then((combinedSchema) => {
       if (opts && (opts.format === 'yaml' || opts.format === 'yml')) {
         return res.type('yaml').send($RefParser.YAML.stringify(combinedSchema));
       }
 
-      res.json(combinedSchema)
+      res.json(combinedSchema);
     })
     .catch(err => next(err));
 };
