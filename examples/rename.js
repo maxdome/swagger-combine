@@ -15,6 +15,11 @@ const config = module.exports = {
         rename: {
           '/pet/{petId}': '/pet/alive/{petId}'
         }
+      },
+      securityDefinitions: {
+        rename: {
+          api_key: 'KEY'
+        }
       }
     },
     {

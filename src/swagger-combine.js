@@ -21,7 +21,7 @@ function filterPaths([schemas, apis, combinedSchema]) {
 }
 
 function renamePaths([schemas, apis, combinedSchema]) {
-  schemas.map((schema, idx) => {
+  schemas = schemas.map((schema, idx) => {
     if (apis[idx].paths && apis[idx].paths.rename && Object.keys(apis[idx].paths.rename).length > 0) {
       _.forIn(apis[idx].paths.rename, (renamePath, pathToRename) => {
         schema.paths = _.mapKeys(schema.paths, (value, curPath) => {
@@ -40,8 +40,71 @@ function renamePaths([schemas, apis, combinedSchema]) {
   return [schemas, apis, combinedSchema];
 }
 
+function renameTags([schemas, apis, combinedSchema]) {
+  schemas = schemas.map((schema, idx) => {
+    if (apis[idx].tags && apis[idx].tags.rename && Object.keys(apis[idx].tags.rename).length > 0) {
+      _.forIn(apis[idx].tags.rename, (newTagName, tagNameToRename) => {
+        traverse(schema).forEach((function traverseSchema() {
+          if (this.key === 'tags' && Array.isArray(this.node) && this.node.includes(tagNameToRename)) {
+            this.update(this.node.map(tag => tag === tagNameToRename ? newTagName : tag)); // eslint-disable-line
+          }
+        }));
+      });
+    }
+
+    return schema;
+  });
+
+  return [schemas, apis, combinedSchema];
+}
+
+function renameSecurityDefinitions([schemas, apis, combinedSchema]) {
+  schemas = schemas.map((schema, idx) => {
+    if (apis[idx].securityDefinitions && apis[idx].securityDefinitions.rename &&
+      Object.keys(apis[idx].securityDefinitions.rename).length > 0) {
+      _.forIn(apis[idx].securityDefinitions.rename, (newName, curName) => {
+        if (_.has(schema.securityDefinitions, curName)) {
+          _.set(schema.securityDefinitions, newName, schema.securityDefinitions[curName]);
+          _.unset(schema.securityDefinitions, curName);
+
+          traverse(schema).forEach((function traverseSchema() {
+            if (this.key === 'security' && Array.isArray(this.node) && this.node.some(sec => !!sec[curName])) {
+              this.update(this.node.map((sec) => {
+                if (_.has(sec, curName)) {
+                  _.set(sec, newName, sec[curName]);
+                  _.unset(sec, curName);
+                }
+
+                return sec;
+              }));
+            }
+          }));
+        }
+      });
+    }
+
+    return schema;
+  });
+
+  schemas = schemas.map((schema, idx) => {
+    if (apis[idx].tags && apis[idx].tags.rename && Object.keys(apis[idx].tags.rename).length > 0) {
+      _.forIn(apis[idx].tags.rename, (newTagName, tagNameToRename) => {
+        traverse(schema).forEach((function traverseSchema() {
+          if (this.key === 'tags' && Array.isArray(this.node) && this.node.includes(tagNameToRename)) {
+            this.update(this.node.map(tag => tag === tagNameToRename ? newTagName : tag)); // eslint-disable-line
+          }
+        }));
+      });
+    }
+
+    return schema;
+  });
+
+  return [schemas, apis, combinedSchema];
+}
+
 function addSecurityToPaths([schemas, apis, combinedSchema]) {
-  schemas.map((schema, idx) => {
+  schemas = schemas.map((schema, idx) => {
     if (apis[idx].paths && apis[idx].paths.security && Object.keys(apis[idx].paths.security).length > 0) {
       _.forIn(apis[idx].paths.security, (securityDefinitions, pathForSecurity) => {
         const hasHttpMethod = /\.(get|put|post|delete|options|head|patch)$/i.test(pathForSecurity);
@@ -62,24 +125,6 @@ function addSecurityToPaths([schemas, apis, combinedSchema]) {
             });
           }
         }
-      });
-    }
-
-    return schema;
-  });
-
-  return [schemas, apis, combinedSchema];
-}
-
-function renameTags([schemas, apis, combinedSchema]) {
-  schemas.map((schema, idx) => {
-    if (apis[idx].tags && apis[idx].tags.rename && Object.keys(apis[idx].tags.rename).length > 0) {
-      _.forIn(apis[idx].tags.rename, (newTagName, tagNameToRename) => {
-        traverse(schema).forEach((function traverseSchema() {
-          if (this.key === 'tags' && Array.isArray(this.node) && this.node.includes(tagNameToRename)) {
-            this.update(this.node.map(tag => tag === tagNameToRename ? newTagName : tag)); // eslint-disable-line
-          }
-        }));
       });
     }
 
@@ -133,6 +178,7 @@ function swaggerCombine(config = 'docs/swagger.json', opts, cb) {
     .then(filterPaths)
     .then(renamePaths)
     .then(renameTags)
+    .then(renameSecurityDefinitions)
     .then(addSecurityToPaths)
     .then(combineSchemas)
     .then(removeEmptyFields)

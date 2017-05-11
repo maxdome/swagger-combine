@@ -84,6 +84,15 @@ describe('[Integration] swagger-combine.js', () => {
     })
   );
 
+  it('renames security definitions', () => swaggerCombine(renameConfig)
+    .then((schema) => {
+      expect(schema.securityDefinitions.api_key).to.not.be.ok;
+      expect(schema.securityDefinitions.KEY).to.be.ok;
+      expect(schema.paths['/pet/alive/{petId}'].get.security).not.to.include({ api_key: [] });
+      expect(schema.paths['/pet/alive/{petId}'].get.security).to.include({ KEY: [] });
+    })
+  );
+
   it('adds security to paths', () => swaggerCombine(securityConfig)
     .then((schema) => {
       expect(schema.paths['/store/order'].post.security).to.include({ petstore_auth: ['write:pets', 'read:pets'] });
