@@ -4,6 +4,7 @@ Swagger Combine
 [![Build Status](https://travis-ci.org/maxdome/swagger-combine.svg)](https://travis-ci.org/maxdome/swagger-combine)
 [![dependencies Status](https://david-dm.org/maxdome/swagger-combine/status.svg)](https://david-dm.org/maxdome/swagger-combine)
 [![devDependencies Status](https://david-dm.org/maxdome/swagger-combine/dev-status.svg)](https://david-dm.org/maxdome/swagger-combine?type=dev)
+[![npm](https://img.shields.io/npm/v/swagger-combine.svg)](https://www.npmjs.com/package/swagger-combine)
 
 Combines multiple Swagger schemas into one dereferenced schema.
 
