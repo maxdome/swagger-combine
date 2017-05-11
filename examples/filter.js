@@ -1,10 +1,12 @@
 const swaggerCombine = require('../src/swagger-combine');
 
-const config = {
+const config = module.exports = {
   swagger: '2.0',
   info: {
     title: 'Swagger Combine Filter Example',
-    version: '1.0.0'
+    version: {
+      $ref: './package.json#/version'
+    }
   },
   apis: [
     {
@@ -22,6 +24,8 @@ const config = {
   ]
 };
 
-swaggerCombine(config)
-  .then(res => console.log(JSON.stringify(res, false, 2)))
-  .catch(err => console.error(err));
+if (!module.parent) {
+  swaggerCombine(config)
+    .then(res => console.log(JSON.stringify(res, false, 2)))
+    .catch(err => console.error(err));
+}

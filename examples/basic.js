@@ -1,10 +1,13 @@
 const swaggerCombine = require('../src/swagger-combine');
 
-const config = {
+const config = module.exports = {
   swagger: '2.0',
   info: {
     title: 'Basic Swagger Combine Example',
-    version: '1.0.0'
+    description: '',
+    version: {
+      $ref: './package.json#/version'
+    }
   },
   apis: [
     {
@@ -16,15 +19,18 @@ const config = {
   ]
 };
 
-swaggerCombine(config)
-  .then(res => console.log(JSON.stringify(res, false, 2)))
-  .catch(err => console.error(err));
+if (!module.parent) {
+  swaggerCombine(config)
+    .then(res => console.log(JSON.stringify(res, false, 2)))
+    .catch(err => console.error(err));
 
-/* Using a callback */
-// swaggerCombine(config, (err, res) => {
-//   if (err) {
-//     console.error(err);
-//   }
-//
-//   console.log(JSON.stringify(res, false, 2));
-// });
+  /* Using a callback */
+  swaggerCombine(config, (err, res) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    console.log(JSON.stringify(res, false, 2));
+  });
+}

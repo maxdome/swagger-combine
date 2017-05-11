@@ -4,8 +4,10 @@
   "description": "Combines multiple Swagger schemas into one dereferenced schema",
   "main": "src/swagger-combine.js",
   "scripts": {
-    "test": "npm run lint",
-    "lint": "eslint **/*.js"
+    "test": "mocha test/*.spec.js",
+    "test:integration": "mocha test/integration.spec.js",
+    "lint": "eslint **/*.js",
+    "prepush": "npm run lint && npm test"
   },
   "keywords": [
     "swagger",
@@ -41,10 +43,14 @@
     "traverse": "^0.6.6"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "chai-somewhere": "^1.0.2",
     "eslint": "^3.19.0",
     "eslint-config-maxdome": "^2.0.0",
     "eslint-plugin-import": "^2.2.0",
-    "express": "^4.15.2"
+    "express": "^4.15.2",
+    "mocha": "^3.3.0"
   },
   "directories": {
     "example": "examples"
