@@ -103,16 +103,19 @@ describe('[Integration] swagger-combine.js', () => {
   describe('middleware', () => {
     it('returns a JSON schema', () => chai.request(app)
       .get('/swagger.json')
-      .then(({ body }) => {
-        expect(body).to.be.an.object;
-        expect(body.paths).to.be.ok;
+      .then((res) => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body.paths).to.be.ok;
       })
     );
 
     it('returns a YAML schema', () => chai.request(app)
       .get('/swagger.yaml')
-      .then(({ text }) => {
-        expect(text).to.include('paths:');
+      .then((res) => {
+        expect(res).to.have.status(200);
+        expect(res).to.have.header('content-type', /^text\/yaml/);
+        expect(res.text).to.include('paths:');
       })
     );
   });
