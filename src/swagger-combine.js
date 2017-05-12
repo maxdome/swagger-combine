@@ -86,20 +86,6 @@ function renameSecurityDefinitions([schemas, apis, combinedSchema]) {
     return schema;
   });
 
-  schemas = schemas.map((schema, idx) => {
-    if (apis[idx].tags && apis[idx].tags.rename && Object.keys(apis[idx].tags.rename).length > 0) {
-      _.forIn(apis[idx].tags.rename, (newTagName, tagNameToRename) => {
-        traverse(schema).forEach((function traverseSchema() {
-          if (this.key === 'tags' && Array.isArray(this.node) && this.node.includes(tagNameToRename)) {
-            this.update(this.node.map(tag => tag === tagNameToRename ? newTagName : tag)); // eslint-disable-line
-          }
-        }));
-      });
-    }
-
-    return schema;
-  });
-
   return [schemas, apis, combinedSchema];
 }
 
