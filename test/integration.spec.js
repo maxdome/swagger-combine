@@ -39,7 +39,7 @@ describe('[Integration] swagger-combine.js', () => {
 
   it('removes empty fields', () => swaggerCombine(basicConfig)
     .then((schema) => {
-      expect(schema.info.description).to.not.be.ok;
+      expect(schema).to.not.have.keys('other');
     })
   );
 
@@ -88,8 +88,8 @@ describe('[Integration] swagger-combine.js', () => {
     .then((schema) => {
       expect(schema.securityDefinitions.api_key).to.not.be.ok;
       expect(schema.securityDefinitions.KEY).to.be.ok;
-      expect(schema.paths['/pet/alive/{petId}'].get.security).not.to.include({ api_key: [] });
-      expect(schema.paths['/pet/alive/{petId}'].get.security).to.include({ KEY: [] });
+      expect(schema.paths['/store/inventory'].get.security).not.to.include({ api_key: [] });
+      expect(schema.paths['/store/inventory'].get.security).to.include({ KEY: [] });
     })
   );
 

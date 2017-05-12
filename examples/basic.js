@@ -4,7 +4,6 @@ const config = module.exports = {
   swagger: '2.0',
   info: {
     title: 'Basic Swagger Combine Example',
-    description: '',
     version: {
       $ref: './package.json#/version'
     }
@@ -16,7 +15,8 @@ const config = module.exports = {
     {
       url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml'
     }
-  ]
+  ],
+  other: {}
 };
 
 if (!module.parent) {
