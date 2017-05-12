@@ -21,11 +21,11 @@ class SwaggerCombine {
       .then(() => this.renameSecurityDefinitions())
       .then(() => this.addSecurityToPaths())
       .then(() => this.combineSchemas())
-      .then(() => this.removeEmptyFields())
+      .then(() => this.removeEmptyFields());
   }
 
   combineAndReturn() {
-    return this.combine().then(() => this.combinedSchema)
+    return this.combine().then(() => this.combinedSchema);
   }
 
   load() {
@@ -184,7 +184,7 @@ class SwaggerCombine {
 
   toString(format = this.opts.format) {
     if (format === 'yaml' || format === 'yml') {
-      return $RefParser.YAML.stringify(this.combinedSchema)
+      return $RefParser.YAML.stringify(this.combinedSchema);
     }
 
     return JSON.stringify(this.combinedSchema);

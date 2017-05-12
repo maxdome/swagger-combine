@@ -6,7 +6,7 @@ Swagger Combine
 [![devDependencies Status](https://david-dm.org/maxdome/swagger-combine/dev-status.svg)](https://david-dm.org/maxdome/swagger-combine?type=dev)
 [![npm](https://img.shields.io/npm/v/swagger-combine.svg)](https://www.npmjs.com/package/swagger-combine)
 
-Combines multiple Swagger schemas into one dereferenced schema.
+>Combines multiple Swagger schemas into one dereferenced schema.
 
 ## Install
 
@@ -180,6 +180,33 @@ Tags can be renamed in the same manner as paths, using the `tags.rename` field.
 }
 ```
 
+### Renaming Security Definitions
+
+Security definitions can be renamed like paths and tags in the `securityDefinitions.rename` field. All usages of the security definition in the paths are renamed as well.
+
+```json
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Swagger Combine Rename Example",
+    "version": "1.0.0"
+  },
+  "apis": [
+    {
+      "url": "http://petstore.swagger.io/v2/swagger.json",
+      "securityDefinitions": {
+        "rename": {
+          "api_key": "KEY"
+        }
+      }
+    },
+    {
+      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+    }
+  ]
+}
+```
+
 ### Path Security
 
 Security can be specified per path using the `paths.security` field.
@@ -217,3 +244,51 @@ Security can be specified per path using the `paths.security` field.
   ]
 }
 ```
+
+## API
+
+### swaggerCombine(config, [options], [callback])
+
+**Returns** `promise` with dereferenced and combined schema.
+
+#### config 
+
+**`string|object`**
+
+> URL/path to config schema file or config schema object. 
+>
+> **Default:** `docs/swagger.json`
+
+#### options
+
+**`object`** *(optional)*
+
+> See [JSON Schema $Ref Parser Options](https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/options.md) for a complete list of options.
+
+#### callback
+
+**`function(err, combinedSchema)`** *(optional)*
+
+> Callback with error and the dereferenced and combined schema.
+
+
+### swaggerCombine.middleware(config, [options])
+
+**Returns** `function(req, res, next)` for usage as middleware.
+
+#### config 
+
+**`string|object`**
+
+> URL/path to config schema file or config schema object. 
+>
+> **Default:** `docs/swagger.json`
+
+#### options
+
+**`object`** *(optional)*
+  
+> See [JSON Schema $Ref Parser Options](https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/options.md) for a complete list of options.
+
+* **format** - `string`
+Content type of the response. `yaml` or `json` *(default)*.
