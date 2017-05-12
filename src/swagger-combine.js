@@ -4,144 +4,191 @@ const maybe = require('call-me-maybe');
 const traverse = require('traverse');
 const _ = require('lodash');
 
-function filterPaths([schemas, apis, combinedSchema]) {
-  schemas.map((schema, idx) => {
-    if (apis[idx].paths) {
-      if (apis[idx].paths.include && apis[idx].paths.include.length > 0) {
-        schema.paths = _.pick(schema.paths, apis[idx].paths.include);
-      } else if (apis[idx].paths.exclude && apis[idx].paths.exclude.length > 0) {
-        schema.paths = _.omit(schema.paths, apis[idx].paths.exclude);
+class SwaggerCombine {
+  constructor(config, opts) {
+    this.config = config;
+    this.opts = opts || {};
+    this.apis = [];
+    this.schemas = [];
+    this.combinedSchema = {};
+  }
+
+  combine() {
+    return this.load()
+      .then(() => this.filterPaths())
+      .then(() => this.renamePaths())
+      .then(() => this.renameTags())
+      .then(() => this.renameSecurityDefinitions())
+      .then(() => this.addSecurityToPaths())
+      .then(() => this.combineSchemas())
+      .then(() => this.removeEmptyFields())
+  }
+
+  combineAndReturn() {
+    return this.combine().then(() => this.combinedSchema)
+  }
+
+  load() {
+    return $RefParser.dereference(this.config, this.opts)
+      .then((configSchema) => {
+        this.apis = configSchema.apis || [];
+        this.combinedSchema = _.omit(configSchema, 'apis');
+
+        return Promise.all(this.apis.map(api => SwaggerParser.dereference(api.url, this.opts)));
+      })
+      .then((apis) => {
+        this.schemas = apis;
+        return this;
+      });
+  }
+
+  filterPaths() {
+    this.schemas = this.schemas.map((schema, idx) => {
+      if (this.apis[idx].paths) {
+        if (this.apis[idx].paths.include && this.apis[idx].paths.include.length > 0) {
+          schema.paths = _.pick(schema.paths, this.apis[idx].paths.include);
+        } else if (this.apis[idx].paths.exclude && this.apis[idx].paths.exclude.length > 0) {
+          schema.paths = _.omit(schema.paths, this.apis[idx].paths.exclude);
+        }
       }
-    }
 
-    return schema;
-  });
+      return schema;
+    });
 
-  return [schemas, apis, combinedSchema];
-}
+    return this;
+  }
 
-function renamePaths([schemas, apis, combinedSchema]) {
-  schemas = schemas.map((schema, idx) => {
-    if (apis[idx].paths && apis[idx].paths.rename && Object.keys(apis[idx].paths.rename).length > 0) {
-      _.forIn(apis[idx].paths.rename, (renamePath, pathToRename) => {
-        schema.paths = _.mapKeys(schema.paths, (value, curPath) => {
-          if (pathToRename === curPath) {
-            return renamePath;
-          }
+  renamePaths() {
+    this.schemas = this.schemas.map((schema, idx) => {
+      if (this.apis[idx].paths && this.apis[idx].paths.rename && Object.keys(this.apis[idx].paths.rename).length > 0) {
+        _.forIn(this.apis[idx].paths.rename, (renamePath, pathToRename) => {
+          schema.paths = _.mapKeys(schema.paths, (value, curPath) => {
+            if (pathToRename === curPath) {
+              return renamePath;
+            }
 
-          return curPath;
+            return curPath;
+          });
         });
-      });
-    }
+      }
 
-    return schema;
-  });
+      return schema;
+    });
 
-  return [schemas, apis, combinedSchema];
-}
+    return this;
+  }
 
-function renameTags([schemas, apis, combinedSchema]) {
-  schemas = schemas.map((schema, idx) => {
-    if (apis[idx].tags && apis[idx].tags.rename && Object.keys(apis[idx].tags.rename).length > 0) {
-      _.forIn(apis[idx].tags.rename, (newTagName, tagNameToRename) => {
-        traverse(schema).forEach((function traverseSchema() {
-          if (this.key === 'tags' && Array.isArray(this.node) && this.node.includes(tagNameToRename)) {
-            this.update(this.node.map(tag => tag === tagNameToRename ? newTagName : tag)); // eslint-disable-line
-          }
-        }));
-      });
-    }
-
-    return schema;
-  });
-
-  return [schemas, apis, combinedSchema];
-}
-
-function renameSecurityDefinitions([schemas, apis, combinedSchema]) {
-  schemas = schemas.map((schema, idx) => {
-    if (apis[idx].securityDefinitions && apis[idx].securityDefinitions.rename &&
-      Object.keys(apis[idx].securityDefinitions.rename).length > 0) {
-      _.forIn(apis[idx].securityDefinitions.rename, (newName, curName) => {
-        if (_.has(schema.securityDefinitions, curName)) {
-          _.set(schema.securityDefinitions, newName, schema.securityDefinitions[curName]);
-          _.unset(schema.securityDefinitions, curName);
-
+  renameTags() {
+    this.schemas = this.schemas.map((schema, idx) => {
+      if (this.apis[idx].tags && this.apis[idx].tags.rename && Object.keys(this.apis[idx].tags.rename).length > 0) {
+        _.forIn(this.apis[idx].tags.rename, (newTagName, tagNameToRename) => {
           traverse(schema).forEach((function traverseSchema() {
-            if (this.key === 'security' && Array.isArray(this.node) && this.node.some(sec => !!sec[curName])) {
-              this.update(this.node.map((sec) => {
-                if (_.has(sec, curName)) {
-                  _.set(sec, newName, sec[curName]);
-                  _.unset(sec, curName);
-                }
-
-                return sec;
-              }));
+            if (this.key === 'tags' && Array.isArray(this.node) && this.node.includes(tagNameToRename)) {
+              this.update(this.node.map(tag => tag === tagNameToRename ? newTagName : tag)); // eslint-disable-line
             }
           }));
-        }
-      });
-    }
+        });
+      }
 
-    return schema;
-  });
+      return schema;
+    });
 
-  return [schemas, apis, combinedSchema];
-}
+    return this;
+  }
 
-function addSecurityToPaths([schemas, apis, combinedSchema]) {
-  schemas = schemas.map((schema, idx) => {
-    if (apis[idx].paths && apis[idx].paths.security && Object.keys(apis[idx].paths.security).length > 0) {
-      _.forIn(apis[idx].paths.security, (securityDefinitions, pathForSecurity) => {
-        const hasHttpMethod = /\.(get|put|post|delete|options|head|patch)$/i.test(pathForSecurity);
-        const pathInSchema = _.get(schema.paths, pathForSecurity);
+  renameSecurityDefinitions() {
+    this.schemas = this.schemas.map((schema, idx) => {
+      if (this.apis[idx].securityDefinitions && this.apis[idx].securityDefinitions.rename &&
+        Object.keys(this.apis[idx].securityDefinitions.rename).length > 0) {
+        _.forIn(this.apis[idx].securityDefinitions.rename, (newName, curName) => {
+          if (_.has(schema.securityDefinitions, curName)) {
+            _.set(schema.securityDefinitions, newName, schema.securityDefinitions[curName]);
+            _.unset(schema.securityDefinitions, curName);
 
-        if (pathInSchema) {
-          if (hasHttpMethod) {
-            _.forIn(securityDefinitions, (scope, type) => {
-              pathInSchema.security = pathInSchema.security || [];
-              pathInSchema.security.push({ [type]: scope });
-            });
-          } else {
-            _.forIn(pathInSchema, (properties, method) => {
-              _.forIn(securityDefinitions, (scope, type) => {
-                pathInSchema[method].security = pathInSchema[method].security || [];
-                pathInSchema[method].security.push({ [type]: scope });
-              });
-            });
+            traverse(schema).forEach((function traverseSchema() {
+              if (this.key === 'security' && Array.isArray(this.node) && this.node.some(sec => !!sec[curName])) {
+                this.update(this.node.map((sec) => {
+                  if (_.has(sec, curName)) {
+                    _.set(sec, newName, sec[curName]);
+                    _.unset(sec, curName);
+                  }
+
+                  return sec;
+                }));
+              }
+            }));
           }
-        }
-      });
+        });
+      }
+
+      return schema;
+    });
+
+    return this;
+  }
+
+  addSecurityToPaths() {
+    this.schemas = this.schemas.map((schema, idx) => {
+      if (this.apis[idx].paths && this.apis[idx].paths.security && Object.keys(this.apis[idx].paths.security).length > 0) {
+        _.forIn(this.apis[idx].paths.security, (securityDefinitions, pathForSecurity) => {
+          const hasHttpMethod = /\.(get|put|post|delete|options|head|patch)$/i.test(pathForSecurity);
+          const pathInSchema = _.get(schema.paths, pathForSecurity);
+
+          if (pathInSchema) {
+            if (hasHttpMethod) {
+              _.forIn(securityDefinitions, (scope, type) => {
+                pathInSchema.security = pathInSchema.security || [];
+                pathInSchema.security.push({ [type]: scope });
+              });
+            } else {
+              _.forIn(pathInSchema, (properties, method) => {
+                _.forIn(securityDefinitions, (scope, type) => {
+                  pathInSchema[method].security = pathInSchema[method].security || [];
+                  pathInSchema[method].security.push({ [type]: scope });
+                });
+              });
+            }
+          }
+        });
+      }
+
+      return schema;
+    });
+
+    return this;
+  }
+
+  combineSchemas() {
+    this.schemas.forEach((schema) => {
+      const conflictingPaths = _.intersection(_.keys(this.combinedSchema.paths), _.keys(schema.paths));
+      const conflictingSecurityDefs = _.intersection(_.keys(this.combinedSchema.securityDefinitions), _.keys(schema.securityDefinitions));
+
+      if (!_.isEmpty(conflictingPaths)) {
+        throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')}`);
+      }
+
+      if (!_.isEmpty(conflictingSecurityDefs)) {
+        throw new Error(`Name conflict in security definitions: ${conflictingSecurityDefs.join(', ')}`);
+      }
+
+      _.defaultsDeep(this.combinedSchema, _.pick(schema, ['paths', 'securityDefinitions']));
+    });
+
+    return this;
+  }
+
+  removeEmptyFields() {
+    this.combinedSchema = _(this.combinedSchema).omitBy(_.isNil).omitBy(_.isEmpty).value();
+    return this;
+  }
+
+  toString(format = this.opts.format) {
+    if (format === 'yaml' || format === 'yml') {
+      return $RefParser.YAML.stringify(this.combinedSchema)
     }
 
-    return schema;
-  });
-
-  return [schemas, apis, combinedSchema];
-}
-
-function combineSchemas([schemas, apis, combinedSchema]) {
-  schemas.forEach((schema, idx) => {
-    const conflictingPaths = _.intersection(_.keys(combinedSchema.paths), _.keys(schema.paths));
-    const conflictingSecurityDefs = _.intersection(_.keys(combinedSchema.securityDefinitions), _.keys(schema.securityDefinitions));
-
-    if (!_.isEmpty(conflictingPaths)) {
-      throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')}`);
-    }
-
-    if (!_.isEmpty(conflictingSecurityDefs)) {
-      throw new Error(`Name conflict in security definitions: ${conflictingSecurityDefs.join(', ')}`);
-    }
-
-    _.defaultsDeep(combinedSchema, _.pick(schema, ['paths', 'securityDefinitions']));
-  });
-
-  return [schemas, apis, combinedSchema];
-}
-
-function removeEmptyFields([schemas, apis, combinedSchema]) {
-  combinedSchema = _(combinedSchema).omitBy(_.isNil).omitBy(_.isEmpty).value();
-  return [schemas, apis, combinedSchema];
+    return JSON.stringify(this.combinedSchema);
+  }
 }
 
 function swaggerCombine(config = 'docs/swagger.json', opts, cb) {
@@ -150,38 +197,21 @@ function swaggerCombine(config = 'docs/swagger.json', opts, cb) {
     opts = null;
   }
 
-  return maybe(cb, $RefParser.dereference(config, opts)
-    .then((configSchema) => {
-      const apis = configSchema.apis;
-      const combinedSchema = _.omit(configSchema, 'apis');
-
-      return Promise.all([
-        Promise.all(apis.map(api => SwaggerParser.dereference(api.url, opts))),
-        Promise.resolve(apis),
-        Promise.resolve(combinedSchema)
-      ]);
-    })
-    .then(filterPaths)
-    .then(renamePaths)
-    .then(renameTags)
-    .then(renameSecurityDefinitions)
-    .then(addSecurityToPaths)
-    .then(combineSchemas)
-    .then(removeEmptyFields)
-    .then(([, , combinedSchema]) => combinedSchema)
-  );
+  return maybe(cb, new SwaggerCombine(config, opts).combineAndReturn());
 }
 
 swaggerCombine.middleware = (config, opts = {}) => (req, res, next) => {
-  swaggerCombine(config, opts)
-    .then((combinedSchema) => {
+  new SwaggerCombine(config, opts).combine()
+    .then((sc) => {
       if (opts && (opts.format === 'yaml' || opts.format === 'yml')) {
-        return res.type('yaml').send($RefParser.YAML.stringify(combinedSchema));
+        return res.type('yaml').send(sc.toString());
       }
 
-      res.json(combinedSchema);
+      res.json(sc.combinedSchema);
     })
     .catch(err => next(err));
 };
+
+swaggerCombine.SwaggerCombine = SwaggerCombine;
 
 module.exports = swaggerCombine;
