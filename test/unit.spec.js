@@ -18,13 +18,41 @@ describe('[Unit] swagger-combine.js', () => {
         paths: {
           '/test/path/first': {
             get: {
-              summary: 'GET /test/path/first'
+              summary: 'GET /test/path/first',
+              parameters: [
+                {
+                  name: 'testParam',
+                  in: 'query'
+                },
+                {
+                  name: 'testParamTwo',
+                  in: 'header'
+                },
+                {
+                  name: 'testParamThree',
+                  in: 'body'
+                },
+                {
+                  name: 'testParamsFour',
+                  in: 'path'
+                }
+              ]
             },
             post: {
               summary: 'POST /test/path/first',
               security: [
                 {
                   test_auth: []
+                }
+              ],
+              parameters: [
+                {
+                  name: 'testParam',
+                  in: 'query'
+                },
+                {
+                  name: 'testParamTwo',
+                  in: 'header'
                 }
               ]
             }
@@ -93,31 +121,6 @@ describe('[Unit] swagger-combine.js', () => {
     });
 
     describe('filterPaths()', () => {
-      it('filters out excluded path', () => {
-        instance.apis = [{
-          paths: {
-            exclude: ['/test/path/first']
-          }
-        }];
-
-        instance.filterPaths();
-        expect(instance.schemas[0].paths).to.not.have.keys('/test/path/first');
-        expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(1);
-      });
-
-      it('filters out excluded method in path', () => {
-        instance.apis = [{
-          paths: {
-            exclude: ['/test/path/first.get']
-          }
-        }];
-
-        instance.filterPaths();
-        expect(instance.schemas[0].paths['/test/path/first']).to.not.have.keys('get');
-        expect(Object.keys(instance.schemas[0].paths['/test/path/first'])).to.have.lengthOf(1);
-        expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(2);
-      });
-
       it('filters included path', () => {
         instance.apis = [{
           paths: {
@@ -142,6 +145,101 @@ describe('[Unit] swagger-combine.js', () => {
         expect(instance.schemas[0].paths['/test/path/second']).to.have.all.keys(['get']);
         expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(1);
         expect(Object.keys(instance.schemas[0].paths['/test/path/second'])).to.have.lengthOf(1);
+      });
+
+      it('filters out excluded path', () => {
+        instance.apis = [{
+          paths: {
+            exclude: ['/test/path/first']
+          }
+        }];
+
+        instance.filterPaths();
+        expect(instance.schemas[0].paths).to.not.have.keys('/test/path/first');
+        expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(1);
+      });
+
+      it('filters out excluded method in path', () => {
+        instance.apis = [{
+          paths: {
+            exclude: ['/test/path/first.get']
+          }
+        }];
+
+        instance.filterPaths();
+        expect(instance.schemas[0].paths['/test/path/first']).to.not.have.keys('get');
+        expect(Object.keys(instance.schemas[0].paths['/test/path/first'])).to.have.lengthOf(1);
+        expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(2);
+      });
+    });
+
+    describe('filterParameters()', () => {
+      it('filters included parameter for method in path', () => {
+        instance.apis = [{
+          paths: {
+            parameters: {
+              include: {
+                '/test/path/first.get': 'testParam'
+              }
+            }
+          }
+        }];
+
+        instance.filterParameters();
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters).to.have.lengthOf(1);
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters.every(param => param.name === 'testParam')).to.be.true;
+      });
+
+      it('filters included parameter for path', () => {
+        instance.apis = [{
+          paths: {
+            parameters: {
+              include: {
+                '/test/path/first': 'testParam'
+              }
+            }
+          }
+        }];
+
+        instance.filterParameters();
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters).to.have.lengthOf(1);
+        expect(instance.schemas[0].paths['/test/path/first'].post.parameters).to.have.lengthOf(1);
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters.every(param => param.name === 'testParam')).to.be.true;
+        expect(instance.schemas[0].paths['/test/path/first'].post.parameters.every(param => param.name === 'testParam')).to.be.true;
+      });
+
+      it('filters out excluded parameter for method in path', () => {
+        instance.apis = [{
+          paths: {
+            parameters: {
+              exclude: {
+                '/test/path/first.get': 'testParam'
+              }
+            }
+          }
+        }];
+
+        instance.filterParameters();
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters).to.have.lengthOf(3);
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters.some(param => param.name === 'testParam')).to.be.false;
+      });
+
+      it('filters out excluded parameter for path', () => {
+        instance.apis = [{
+          paths: {
+            parameters: {
+              exclude: {
+                '/test/path/first': 'testParam'
+              }
+            }
+          }
+        }];
+
+        instance.filterParameters();
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters).to.have.lengthOf(3);
+        expect(instance.schemas[0].paths['/test/path/first'].post.parameters).to.have.lengthOf(1);
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters.some(param => param.name === 'testParam')).to.be.false;
+        expect(instance.schemas[0].paths['/test/path/first'].post.parameters.some(param => param.name === 'testParam')).to.be.false;
       });
     });
 

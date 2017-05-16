@@ -12,13 +12,27 @@ const config = module.exports = {
     {
       url: 'http://petstore.swagger.io/v2/swagger.json',
       paths: {
-        exclude: ['/pet/{petId}', '/pet.put']
+        exclude: ['/pet/{petId}', '/pet.put'],
+        parameters: {
+          exclude: {
+            '/pet/findByStatus': 'status'
+          }
+        }
       }
     },
     {
       url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml',
       paths: {
-        include: ['/users/{userId}/publications', '/me.get']
+        include: [
+          '/users/{userId}/publications',
+          '/publications/{publicationId}/posts',
+          '/me.get'
+        ],
+        parameters: {
+          include: {
+            '/publications/{publicationId}/posts.post': 'publicationId'
+          }
+        }
       }
     }
   ]

@@ -126,6 +126,47 @@ Paths can be filtered by using an array of paths to `exclude` or `include`.
 }
 ```
 
+### Filtering Parameters
+
+Parameters can be filtered by specifying the path and the parameter name as to `exclude` or `include` as key/value pairs in `paths.parameters`.
+
+```json
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Swagger Combine Filter Example",
+    "version": "1.0.0"
+  },
+  "apis": [
+    {
+      "url": "http://petstore.swagger.io/v2/swagger.json",
+      "paths": {
+        "parameters": {
+          "exclude": {
+            "/pet/findByStatus": "status"
+          }
+        }
+      }
+    },
+    {
+      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml",
+      "paths": {
+        "include": [
+          "/users/{userId}/publications",
+          "/publications/{publicationId}/posts",
+          "/me.get"
+        ],
+        "parameters": {
+          "include": {
+            "/publications/{publicationId}/posts.post": "publicationId"
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
 ### Renaming Paths
 
 Paths can be renamed by specifying the path to rename and the new path name as key/value pairs in `paths.rename`.

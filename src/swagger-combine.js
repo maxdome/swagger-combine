@@ -16,6 +16,7 @@ class SwaggerCombine {
   combine() {
     return this.load()
       .then(() => this.filterPaths())
+      .then(() => this.filterParameters())
       .then(() => this.renamePaths())
       .then(() => this.renameTags())
       .then(() => this.renameSecurityDefinitions())
@@ -49,6 +50,51 @@ class SwaggerCombine {
           schema.paths = _.pick(schema.paths, this.apis[idx].paths.include);
         } else if (this.apis[idx].paths.exclude && this.apis[idx].paths.exclude.length > 0) {
           schema.paths = _.omit(schema.paths, this.apis[idx].paths.exclude);
+        }
+      }
+
+      return schema;
+    });
+
+    return this;
+  }
+
+  filterParameters() {
+    this.schemas = this.schemas.map((schema, idx) => {
+      if (this.apis[idx].paths && this.apis[idx].paths.parameters) {
+        const excludeParameters = this.apis[idx].paths.parameters.exclude;
+        const includeParameters = this.apis[idx].paths.parameters.include;
+
+        if (includeParameters && !_.isEmpty(includeParameters)) {
+          _.forIn(includeParameters, (parameterToInclude, parameterPath) => {
+            const hasHttpMethod = /\.(get|put|post|delete|options|head|patch)$/i.test(parameterPath);
+            const pathInSchema = _.get(schema.paths, parameterPath);
+
+            if (pathInSchema) {
+              if (hasHttpMethod) {
+                pathInSchema.parameters = _.filter(pathInSchema.parameters, curParam => curParam.name === parameterToInclude);
+              } else {
+                _.forIn(pathInSchema, (properties, method) => {
+                  pathInSchema[method].parameters = _.filter(pathInSchema[method].parameters, curParam => curParam.name === parameterToInclude);
+                });
+              }
+            }
+          });
+        } else if (excludeParameters && !_.isEmpty(excludeParameters)) {
+          _.forIn(excludeParameters, (parameterToExclude, parameterPath) => {
+            const hasHttpMethod = /\.(get|put|post|delete|options|head|patch)$/i.test(parameterPath);
+            const pathInSchema = _.get(schema.paths, parameterPath);
+
+            if (pathInSchema) {
+              if (hasHttpMethod) {
+                pathInSchema.parameters = _.remove(pathInSchema.parameters, curParam => curParam.name !== parameterToExclude);
+              } else {
+                _.forIn(pathInSchema, (properties, method) => {
+                  pathInSchema[method].parameters = _.remove(pathInSchema[method].parameters, curParam => curParam.name !== parameterToExclude);
+                });
+              }
+            }
+          });
         }
       }
 
