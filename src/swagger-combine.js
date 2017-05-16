@@ -183,7 +183,7 @@ class SwaggerCombine {
   }
 
   toString(format = this.opts.format) {
-    if (format === 'yaml' || format === 'yml') {
+    if (String(format).toLowerCase() === 'yaml' || String(format).toLowerCase() === 'yml') {
       return $RefParser.YAML.stringify(this.combinedSchema);
     }
 
