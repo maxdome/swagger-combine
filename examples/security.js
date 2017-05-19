@@ -1,12 +1,12 @@
 const swaggerCombine = require('../src/swagger-combine');
 
-const config = module.exports = {
+const config = (module.exports = {
   swagger: '2.0',
   info: {
     title: 'Swagger Combine Security Example',
     version: {
-      $ref: './package.json#/version'
-    }
+      $ref: './package.json#/version',
+    },
   },
   apis: [
     {
@@ -14,19 +14,19 @@ const config = module.exports = {
       paths: {
         security: {
           '/store/order': {
-            petstore_auth: ['write:pets', 'read:pets']
+            petstore_auth: ['write:pets', 'read:pets'],
           },
           '/store/order/{orderId}.delete': {
-            petstore_auth: ['write:pets', 'read:pets']
-          }
-        }
-      }
+            petstore_auth: ['write:pets', 'read:pets'],
+          },
+        },
+      },
     },
     {
-      url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml'
-    }
-  ]
-};
+      url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml',
+    },
+  ],
+});
 
 if (!module.parent) {
   swaggerCombine(config)

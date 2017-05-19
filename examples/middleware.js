@@ -1,10 +1,13 @@
-const app = module.exports = require('express')(); // eslint-disable-line
+const app = (module.exports = require('express')()); // eslint-disable-line
 const swaggerCombine = require('../src/swagger-combine');
 
 const basicConfig = require('./basic');
 
 app.get('/swagger.json', swaggerCombine.middleware(basicConfig));
-app.get('/swagger.yaml', swaggerCombine.middleware(basicConfig, { format: 'yaml' }));
+app.get(
+  '/swagger.yaml',
+  swaggerCombine.middleware(basicConfig, { format: 'yaml' })
+);
 app.use((err, req, res, next) => console.error(err));
 
 if (!module.parent) {

@@ -1,12 +1,12 @@
 const swaggerCombine = require('../src/swagger-combine');
 
-const config = module.exports = {
+const config = (module.exports = {
   swagger: '2.0',
   info: {
     title: 'Swagger Combine Filter Example',
     version: {
-      $ref: './package.json#/version'
-    }
+      $ref: './package.json#/version',
+    },
   },
   apis: [
     {
@@ -15,10 +15,10 @@ const config = module.exports = {
         exclude: ['/pet/{petId}', '/pet.put'],
         parameters: {
           exclude: {
-            '/pet/findByStatus': 'status'
-          }
-        }
-      }
+            '/pet/findByStatus': 'status',
+          },
+        },
+      },
     },
     {
       url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml',
@@ -26,17 +26,17 @@ const config = module.exports = {
         include: [
           '/users/{userId}/publications',
           '/publications/{publicationId}/posts',
-          '/me.get'
+          '/me.get',
         ],
         parameters: {
           include: {
-            '/publications/{publicationId}/posts.post': 'publicationId'
-          }
-        }
-      }
-    }
-  ]
-};
+            '/publications/{publicationId}/posts.post': 'publicationId',
+          },
+        },
+      },
+    },
+  ],
+});
 
 if (!module.parent) {
   swaggerCombine(config)

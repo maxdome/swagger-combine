@@ -14,66 +14,68 @@ describe('[Unit] swagger-combine.js', () => {
     beforeEach(() => {
       instance = new swaggerCombine.SwaggerCombine();
       instance.config = {};
-      instance.schemas = [{
-        paths: {
-          '/test/path/first': {
-            get: {
-              summary: 'GET /test/path/first',
-              parameters: [
-                {
-                  name: 'testParam',
-                  in: 'query'
-                },
-                {
-                  name: 'testParamTwo',
-                  in: 'header'
-                },
-                {
-                  name: 'testParamThree',
-                  in: 'body'
-                },
-                {
-                  name: 'testParamsFour',
-                  in: 'path'
-                }
-              ]
+      instance.schemas = [
+        {
+          paths: {
+            '/test/path/first': {
+              get: {
+                summary: 'GET /test/path/first',
+                parameters: [
+                  {
+                    name: 'testParam',
+                    in: 'query',
+                  },
+                  {
+                    name: 'testParamTwo',
+                    in: 'header',
+                  },
+                  {
+                    name: 'testParamThree',
+                    in: 'body',
+                  },
+                  {
+                    name: 'testParamsFour',
+                    in: 'path',
+                  },
+                ],
+              },
+              post: {
+                summary: 'POST /test/path/first',
+                security: [
+                  {
+                    test_auth: [],
+                  },
+                ],
+                parameters: [
+                  {
+                    name: 'testParam',
+                    in: 'query',
+                  },
+                  {
+                    name: 'testParamTwo',
+                    in: 'header',
+                  },
+                ],
+              },
             },
-            post: {
-              summary: 'POST /test/path/first',
-              security: [
-                {
-                  test_auth: []
-                }
-              ],
-              parameters: [
-                {
-                  name: 'testParam',
-                  in: 'query'
-                },
-                {
-                  name: 'testParamTwo',
-                  in: 'header'
-                }
-              ]
-            }
+            '/test/path/second': {
+              get: {
+                summary: 'GET /test/path/second',
+                tags: ['testTagFirst', 'testTagSecond'],
+              },
+              post: {
+                summary: 'POST /test/path/second',
+                tags: ['testTagFirst', 'testTagSecond'],
+              },
+            },
           },
-          '/test/path/second': {
-            get: {
-              summary: 'GET /test/path/second',
-              tags: ['testTagFirst', 'testTagSecond']
+          securityDefinitions: {
+            test_auth: {
+              type: 'apiKey',
             },
-            post: {
-              summary: 'POST /test/path/second',
-              tags: ['testTagFirst', 'testTagSecond']
-            }
-          }
+          },
         },
-        securityDefinitions: {
-          test_auth: {
-            type: 'apiKey'
-          }
-        }
-      }];
+      ];
     });
 
     describe('combine()', () => {
@@ -92,19 +94,17 @@ describe('[Unit] swagger-combine.js', () => {
         expect(instance.combine()).to.be.a('promise');
       });
 
-      it('calls all functions', () => instance
-          .combine()
-          .then(() => {
-            expect(instance.load).to.have.been.calledOnce;
-            expect(instance.filterPaths).to.have.been.calledOnce;
-            expect(instance.renamePaths).to.have.been.calledOnce;
-            expect(instance.renameTags).to.have.been.calledOnce;
-            expect(instance.renameSecurityDefinitions).to.have.been.calledOnce;
-            expect(instance.addSecurityToPaths).to.have.been.calledOnce;
-            expect(instance.combineSchemas).to.have.been.calledOnce;
-            expect(instance.removeEmptyFields).to.have.been.calledOnce;
-          })
-      );
+      it('calls all functions', () =>
+        instance.combine().then(() => {
+          expect(instance.load).to.have.been.calledOnce;
+          expect(instance.filterPaths).to.have.been.calledOnce;
+          expect(instance.renamePaths).to.have.been.calledOnce;
+          expect(instance.renameTags).to.have.been.calledOnce;
+          expect(instance.renameSecurityDefinitions).to.have.been.calledOnce;
+          expect(instance.addSecurityToPaths).to.have.been.calledOnce;
+          expect(instance.combineSchemas).to.have.been.calledOnce;
+          expect(instance.removeEmptyFields).to.have.been.calledOnce;
+        }));
 
       afterEach(() => sandbox.restore());
     });
@@ -113,46 +113,59 @@ describe('[Unit] swagger-combine.js', () => {
       it('returns a promise with combined schema', () => {
         instance.config = { test: 'test' };
 
-        return instance.combineAndReturn()
-          .then((schema) => {
-            expect(schema).to.eql({ test: 'test' });
-          });
+        return instance.combineAndReturn().then(schema => {
+          expect(schema).to.eql({ test: 'test' });
+        });
       });
     });
 
     describe('filterPaths()', () => {
       it('filters included path', () => {
-        instance.apis = [{
-          paths: {
-            include: ['/test/path/second']
-          }
-        }];
+        instance.apis = [
+          {
+            paths: {
+              include: ['/test/path/second'],
+            },
+          },
+        ];
 
         instance.filterPaths();
-        expect(instance.schemas[0].paths).to.have.all.keys(['/test/path/second']);
+        expect(instance.schemas[0].paths).to.have.all.keys([
+          '/test/path/second',
+        ]);
         expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(1);
       });
 
       it('filters included method in path', () => {
-        instance.apis = [{
-          paths: {
-            include: ['/test/path/second.get']
-          }
-        }];
+        instance.apis = [
+          {
+            paths: {
+              include: ['/test/path/second.get'],
+            },
+          },
+        ];
 
         instance.filterPaths();
-        expect(instance.schemas[0].paths).to.have.all.keys(['/test/path/second']);
-        expect(instance.schemas[0].paths['/test/path/second']).to.have.all.keys(['get']);
+        expect(instance.schemas[0].paths).to.have.all.keys([
+          '/test/path/second',
+        ]);
+        expect(
+          instance.schemas[0].paths['/test/path/second']
+        ).to.have.all.keys(['get']);
         expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(1);
-        expect(Object.keys(instance.schemas[0].paths['/test/path/second'])).to.have.lengthOf(1);
+        expect(
+          Object.keys(instance.schemas[0].paths['/test/path/second'])
+        ).to.have.lengthOf(1);
       });
 
       it('filters out excluded path', () => {
-        instance.apis = [{
-          paths: {
-            exclude: ['/test/path/first']
-          }
-        }];
+        instance.apis = [
+          {
+            paths: {
+              exclude: ['/test/path/first'],
+            },
+          },
+        ];
 
         instance.filterPaths();
         expect(instance.schemas[0].paths).to.not.have.keys('/test/path/first');
@@ -160,177 +173,260 @@ describe('[Unit] swagger-combine.js', () => {
       });
 
       it('filters out excluded method in path', () => {
-        instance.apis = [{
-          paths: {
-            exclude: ['/test/path/first.get']
-          }
-        }];
+        instance.apis = [
+          {
+            paths: {
+              exclude: ['/test/path/first.get'],
+            },
+          },
+        ];
 
         instance.filterPaths();
-        expect(instance.schemas[0].paths['/test/path/first']).to.not.have.keys('get');
-        expect(Object.keys(instance.schemas[0].paths['/test/path/first'])).to.have.lengthOf(1);
+        expect(instance.schemas[0].paths['/test/path/first']).to.not.have.keys(
+          'get'
+        );
+        expect(
+          Object.keys(instance.schemas[0].paths['/test/path/first'])
+        ).to.have.lengthOf(1);
         expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(2);
       });
     });
 
     describe('filterParameters()', () => {
       it('filters included parameter for method in path', () => {
-        instance.apis = [{
-          paths: {
-            parameters: {
-              include: {
-                '/test/path/first.get': 'testParam'
-              }
-            }
-          }
-        }];
+        instance.apis = [
+          {
+            paths: {
+              parameters: {
+                include: {
+                  '/test/path/first.get': 'testParam',
+                },
+              },
+            },
+          },
+        ];
 
         instance.filterParameters();
-        expect(instance.schemas[0].paths['/test/path/first'].get.parameters).to.have.lengthOf(1);
-        expect(instance.schemas[0].paths['/test/path/first'].get.parameters.every(param => param.name === 'testParam')).to.be.true;
+        expect(
+          instance.schemas[0].paths['/test/path/first'].get.parameters
+        ).to.have.lengthOf(1);
+        expect(
+          instance.schemas[0].paths['/test/path/first'].get.parameters.every(
+            param => param.name === 'testParam'
+          )
+        ).to.be.true;
       });
 
       it('filters included parameter for path', () => {
-        instance.apis = [{
-          paths: {
-            parameters: {
-              include: {
-                '/test/path/first': 'testParam'
-              }
-            }
-          }
-        }];
+        instance.apis = [
+          {
+            paths: {
+              parameters: {
+                include: {
+                  '/test/path/first': 'testParam',
+                },
+              },
+            },
+          },
+        ];
 
         instance.filterParameters();
-        expect(instance.schemas[0].paths['/test/path/first'].get.parameters).to.have.lengthOf(1);
-        expect(instance.schemas[0].paths['/test/path/first'].post.parameters).to.have.lengthOf(1);
-        expect(instance.schemas[0].paths['/test/path/first'].get.parameters.every(param => param.name === 'testParam')).to.be.true;
-        expect(instance.schemas[0].paths['/test/path/first'].post.parameters.every(param => param.name === 'testParam')).to.be.true;
+        expect(
+          instance.schemas[0].paths['/test/path/first'].get.parameters
+        ).to.have.lengthOf(1);
+        expect(
+          instance.schemas[0].paths['/test/path/first'].post.parameters
+        ).to.have.lengthOf(1);
+        expect(
+          instance.schemas[0].paths['/test/path/first'].get.parameters.every(
+            param => param.name === 'testParam'
+          )
+        ).to.be.true;
+        expect(
+          instance.schemas[0].paths['/test/path/first'].post.parameters.every(
+            param => param.name === 'testParam'
+          )
+        ).to.be.true;
       });
 
       it('filters out excluded parameter for method in path', () => {
-        instance.apis = [{
-          paths: {
-            parameters: {
-              exclude: {
-                '/test/path/first.get': 'testParam'
-              }
-            }
-          }
-        }];
+        instance.apis = [
+          {
+            paths: {
+              parameters: {
+                exclude: {
+                  '/test/path/first.get': 'testParam',
+                },
+              },
+            },
+          },
+        ];
 
         instance.filterParameters();
-        expect(instance.schemas[0].paths['/test/path/first'].get.parameters).to.have.lengthOf(3);
-        expect(instance.schemas[0].paths['/test/path/first'].get.parameters.some(param => param.name === 'testParam')).to.be.false;
+        expect(
+          instance.schemas[0].paths['/test/path/first'].get.parameters
+        ).to.have.lengthOf(3);
+        expect(
+          instance.schemas[0].paths['/test/path/first'].get.parameters.some(
+            param => param.name === 'testParam'
+          )
+        ).to.be.false;
       });
 
       it('filters out excluded parameter for path', () => {
-        instance.apis = [{
-          paths: {
-            parameters: {
-              exclude: {
-                '/test/path/first': 'testParam'
-              }
-            }
-          }
-        }];
+        instance.apis = [
+          {
+            paths: {
+              parameters: {
+                exclude: {
+                  '/test/path/first': 'testParam',
+                },
+              },
+            },
+          },
+        ];
 
         instance.filterParameters();
-        expect(instance.schemas[0].paths['/test/path/first'].get.parameters).to.have.lengthOf(3);
-        expect(instance.schemas[0].paths['/test/path/first'].post.parameters).to.have.lengthOf(1);
-        expect(instance.schemas[0].paths['/test/path/first'].get.parameters.some(param => param.name === 'testParam')).to.be.false;
-        expect(instance.schemas[0].paths['/test/path/first'].post.parameters.some(param => param.name === 'testParam')).to.be.false;
+        expect(
+          instance.schemas[0].paths['/test/path/first'].get.parameters
+        ).to.have.lengthOf(3);
+        expect(
+          instance.schemas[0].paths['/test/path/first'].post.parameters
+        ).to.have.lengthOf(1);
+        expect(
+          instance.schemas[0].paths['/test/path/first'].get.parameters.some(
+            param => param.name === 'testParam'
+          )
+        ).to.be.false;
+        expect(
+          instance.schemas[0].paths['/test/path/first'].post.parameters.some(
+            param => param.name === 'testParam'
+          )
+        ).to.be.false;
       });
     });
 
     describe('renamePaths()', () => {
       it('renames path', () => {
-        instance.apis = [{
-          paths: {
-            rename: {
-              '/test/path/first': '/test/path/renamed'
-            }
-          }
-        }];
+        instance.apis = [
+          {
+            paths: {
+              rename: {
+                '/test/path/first': '/test/path/renamed',
+              },
+            },
+          },
+        ];
 
         instance.renamePaths();
         expect(instance.schemas[0].paths).to.not.have.keys('/test/path/first');
-        expect(instance.schemas[0].paths).to.have.any.keys('/test/path/renamed');
+        expect(instance.schemas[0].paths).to.have.any.keys(
+          '/test/path/renamed'
+        );
       });
     });
 
     describe('renameTags()', () => {
       it('renames tags', () => {
-        instance.apis = [{
-          tags: {
-            rename: {
-              testTagFirst: 'testTagRenamed'
-            }
-          }
-        }];
+        instance.apis = [
+          {
+            tags: {
+              rename: {
+                testTagFirst: 'testTagRenamed',
+              },
+            },
+          },
+        ];
 
         instance.renameTags();
-        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.not.include('testTagFirst');
-        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.include('testTagRenamed');
-        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.have.lengthOf(2);
+        expect(
+          instance.schemas[0].paths['/test/path/second'].get.tags
+        ).to.not.include('testTagFirst');
+        expect(
+          instance.schemas[0].paths['/test/path/second'].get.tags
+        ).to.include('testTagRenamed');
+        expect(
+          instance.schemas[0].paths['/test/path/second'].get.tags
+        ).to.have.lengthOf(2);
       });
     });
 
     describe('renameSecurityDefinitions()', () => {
       beforeEach(() => {
-        instance.apis = [{
-          securityDefinitions: {
-            rename: {
-              test_auth: 'renamed_auth'
-            }
-          }
-        }];
+        instance.apis = [
+          {
+            securityDefinitions: {
+              rename: {
+                test_auth: 'renamed_auth',
+              },
+            },
+          },
+        ];
       });
 
       it('renames security definitions', () => {
         instance.renameSecurityDefinitions();
-        expect(instance.schemas[0].securityDefinitions).to.not.have.keys('test_auth');
-        expect(instance.schemas[0].securityDefinitions).to.have.keys('renamed_auth');
+        expect(instance.schemas[0].securityDefinitions).to.not.have.keys(
+          'test_auth'
+        );
+        expect(instance.schemas[0].securityDefinitions).to.have.keys(
+          'renamed_auth'
+        );
       });
 
       it('renames security in pahts', () => {
         instance.renameSecurityDefinitions();
-        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.not.include({ test_auth: [] });
-        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.include({ renamed_auth: [] });
+        expect(
+          instance.schemas[0].paths['/test/path/first'].post.security
+        ).to.not.include({ test_auth: [] });
+        expect(
+          instance.schemas[0].paths['/test/path/first'].post.security
+        ).to.include({ renamed_auth: [] });
       });
     });
 
     describe('addSecurityToPaths()', () => {
       it('adds security to all methods in path', () => {
-        instance.apis = [{
-          paths: {
-            security: {
-              '/test/path/second': {
-                test_security: []
-              }
-            }
-          }
-        }];
+        instance.apis = [
+          {
+            paths: {
+              security: {
+                '/test/path/second': {
+                  test_security: [],
+                },
+              },
+            },
+          },
+        ];
 
         instance.addSecurityToPaths();
-        expect(instance.schemas[0].paths['/test/path/second'].get.security).to.include({ test_security: [] });
-        expect(instance.schemas[0].paths['/test/path/second'].post.security).to.include({ test_security: [] });
+        expect(
+          instance.schemas[0].paths['/test/path/second'].get.security
+        ).to.include({ test_security: [] });
+        expect(
+          instance.schemas[0].paths['/test/path/second'].post.security
+        ).to.include({ test_security: [] });
       });
 
       it('adds security to method in path', () => {
-        instance.apis = [{
-          paths: {
-            security: {
-              '/test/path/second.get': {
-                test_security: []
-              }
-            }
-          }
-        }];
+        instance.apis = [
+          {
+            paths: {
+              security: {
+                '/test/path/second.get': {
+                  test_security: [],
+                },
+              },
+            },
+          },
+        ];
 
         instance.addSecurityToPaths();
-        expect(instance.schemas[0].paths['/test/path/second'].get.security).to.include({ test_security: [] });
-        expect(instance.schemas[0].paths['/test/path/second'].post.security).to.not.be.ok;
+        expect(
+          instance.schemas[0].paths['/test/path/second'].get.security
+        ).to.include({ test_security: [] });
+        expect(instance.schemas[0].paths['/test/path/second'].post.security).to
+          .not.be.ok;
       });
     });
 
@@ -340,10 +436,10 @@ describe('[Unit] swagger-combine.js', () => {
           paths: {
             '/schematwo/test': {
               get: {
-                summary: 'GET /schematwo/test'
-              }
-            }
-          }
+                summary: 'GET /schematwo/test',
+              },
+            },
+          },
         });
 
         instance.combineSchemas();
@@ -351,7 +447,7 @@ describe('[Unit] swagger-combine.js', () => {
         expect(instance.combinedSchema.paths).to.have.all.keys([
           '/test/path/first',
           '/test/path/second',
-          '/schematwo/test'
+          '/schematwo/test',
         ]);
       });
 
@@ -359,16 +455,18 @@ describe('[Unit] swagger-combine.js', () => {
         instance.schemas.push({
           securityDefinitions: {
             schema_two_auth: {
-              type: 'apiKey'
-            }
-          }
+              type: 'apiKey',
+            },
+          },
         });
 
         instance.combineSchemas();
-        expect(Object.keys(instance.combinedSchema.securityDefinitions)).to.have.length(2);
+        expect(
+          Object.keys(instance.combinedSchema.securityDefinitions)
+        ).to.have.length(2);
         expect(instance.combinedSchema.securityDefinitions).to.have.all.keys([
           'test_auth',
-          'schema_two_auth'
+          'schema_two_auth',
         ]);
       });
 
@@ -377,25 +475,29 @@ describe('[Unit] swagger-combine.js', () => {
           paths: {
             '/test/path/first': {
               get: {
-                summary: 'GET /test/path/first duplicate'
-              }
-            }
-          }
+                summary: 'GET /test/path/first duplicate',
+              },
+            },
+          },
         });
 
-        expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in paths: \/test\/path\/first/);
+        expect(instance.combineSchemas.bind(instance)).to.throw(
+          /Name conflict in paths: \/test\/path\/first/
+        );
       });
 
       it('throws an error if security defintion name already exists', () => {
         instance.schemas.push({
           securityDefinitions: {
             test_auth: {
-              type: 'apiKey'
-            }
-          }
+              type: 'apiKey',
+            },
+          },
         });
 
-        expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in security definitions: test_auth/);
+        expect(instance.combineSchemas.bind(instance)).to.throw(
+          /Name conflict in security definitions: test_auth/
+        );
       });
     });
 
@@ -409,7 +511,7 @@ describe('[Unit] swagger-combine.js', () => {
         expect(instance.combinedSchema).to.not.have.any.keys([
           'empty',
           'emptyTwo',
-          'emptyThree'
+          'emptyThree',
         ]);
       });
     });
@@ -418,21 +520,27 @@ describe('[Unit] swagger-combine.js', () => {
       beforeEach(() => {
         instance.combinedSchema = {
           test: 'test',
-          testTwo: ['test']
+          testTwo: ['test'],
         };
       });
 
       it('returns stringified combined schema', () => {
-        expect(instance.toString()).to.equal('{"test":"test","testTwo":["test"]}');
+        expect(instance.toString()).to.equal(
+          '{"test":"test","testTwo":["test"]}'
+        );
       });
 
       it('returns YAML string if specified', () => {
-        expect(instance.toString('yaml')).to.equal('test: test\ntestTwo:\n  - test\n');
+        expect(instance.toString('yaml')).to.equal(
+          'test: test\ntestTwo:\n  - test\n'
+        );
       });
 
       it('returns YAML string if spcified in opts', () => {
         instance.opts = { format: 'yaml' };
-        expect(instance.toString()).to.equal('test: test\ntestTwo:\n  - test\n');
+        expect(instance.toString()).to.equal(
+          'test: test\ntestTwo:\n  - test\n'
+        );
       });
     });
   });

@@ -1,23 +1,23 @@
 const swaggerCombine = require('../src/swagger-combine');
 
-const config = module.exports = {
+const config = (module.exports = {
   swagger: '2.0',
   info: {
     title: 'Basic Swagger Combine Example',
     version: {
-      $ref: './package.json#/version'
-    }
+      $ref: './package.json#/version',
+    },
   },
   apis: [
     {
-      url: 'http://petstore.swagger.io/v2/swagger.json'
+      url: 'http://petstore.swagger.io/v2/swagger.json',
     },
     {
-      url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml'
-    }
+      url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml',
+    },
   ],
-  other: {}
-};
+  other: {},
+});
 
 if (!module.parent) {
   swaggerCombine(config)
