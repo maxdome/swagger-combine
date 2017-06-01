@@ -1,4 +1,4 @@
-const app = (module.exports = require('express')()); // eslint-disable-line
+const app = (module.exports = require('express')());
 const swaggerCombine = require('../src/swagger-combine');
 
 const basicConfig = require('./basic');

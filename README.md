@@ -72,6 +72,12 @@ The middleware runs the combine function on every request. Since Swagger documen
     },
     {
       "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+    },
+    {
+      "url": "https://api.apis.guru/v2/specs/deutschebahn.com/betriebsstellen/v1/swagger.json",
+      "paths": {
+        "base": "/bahn"
+      }
     }
   ]
 }
@@ -87,6 +93,9 @@ info:
 apis:
   - url: 'http://petstore.swagger.io/v2/swagger.json'
   - url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml'
+  - url: 'https://api.apis.guru/v2/specs/deutschebahn.com/betriebsstellen/v1/swagger.json'
+    paths:
+      base: '/bahn'
 ```
 
 *All example configurations are located in the `examples` folder.*

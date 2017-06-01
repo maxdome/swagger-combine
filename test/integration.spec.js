@@ -119,6 +119,12 @@ describe('[Integration] swagger-combine.js', () => {
       ).to.include({ petstore_auth: ['write:pets', 'read:pets'] });
     }));
 
+  it('adds base to all paths of an API', () =>
+    swaggerCombine(basicConfig).then(schema => {
+      expect(schema.paths).to.not.have.any.key('/betriebsstellen');
+      expect(schema.paths).to.have.any.key('/bahn/betriebsstellen');
+    }));
+
   describe('middleware', () => {
     it('returns a JSON schema', () =>
       chai.request(app).get('/swagger.json').then(res => {

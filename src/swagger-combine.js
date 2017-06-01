@@ -1,6 +1,7 @@
 const $RefParser = require('json-schema-ref-parser');
 const SwaggerParser = require('swagger-parser');
 const maybe = require('call-me-maybe');
+const urlJoin = require('url-join');
 const traverse = require('traverse');
 const _ = require('lodash');
 
@@ -21,6 +22,7 @@ class SwaggerCombine {
       .then(() => this.renameTags())
       .then(() => this.renameSecurityDefinitions())
       .then(() => this.addSecurityToPaths())
+      .then(() => this.addBasePath())
       .then(() => this.combineSchemas())
       .then(() => this.removeEmptyFields());
   }
@@ -171,7 +173,7 @@ class SwaggerCombine {
                 this.node.map(
                   tag => (tag === tagNameToRename ? newTagName : tag)
                 )
-              ); // eslint-disable-line
+              );
             }
           });
         });
@@ -263,6 +265,20 @@ class SwaggerCombine {
             }
           }
         );
+      }
+
+      return schema;
+    });
+
+    return this;
+  }
+
+  addBasePath() {
+    this.schemas = this.schemas.map((schema, idx) => {
+      if (this.apis[idx].paths && this.apis[idx].paths.base) {
+        schema.paths = _.mapKeys(schema.paths, (value, curPath) => {
+          return urlJoin(this.apis[idx].paths.base, curPath);
+        });
       }
 
       return schema;

@@ -41,16 +41,17 @@
     "json-schema-ref-parser": "^3.1.2",
     "lodash": "^4.17.4",
     "swagger-parser": "^3.4.1",
-    "traverse": "^0.6.6"
+    "traverse": "^0.6.6",
+    "url-join": "^2.0.2"
   },
   "devDependencies": {
-    "@maxdome/prettier": "^1.0.0",
+    "@maxdome/prettier": "^1.0.3",
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
     "chai-somewhere": "^1.0.2",
-    "express": "^4.15.2",
-    "mocha": "^3.3.0",
-    "sinon": "^2.2.0",
+    "express": "^4.15.3",
+    "mocha": "^3.4.2",
+    "sinon": "^2.3.2",
     "sinon-chai": "^2.10.0"
   },
   "directories": {

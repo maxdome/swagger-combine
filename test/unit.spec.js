@@ -430,6 +430,25 @@ describe('[Unit] swagger-combine.js', () => {
       });
     });
 
+    describe('addBasePath()', () => {
+      it('adds a base to all paths of an API', () => {
+        instance.apis = [
+          {
+            paths: {
+              base: '/base',
+            },
+          },
+        ];
+
+        instance.addBasePath();
+        expect(
+          Object.keys(instance.schemas[0].paths).every(path =>
+            /^\/base\/.*/.test(path)
+          )
+        ).to.be.ok;
+      });
+    });
+
     describe('combineSchemas()', () => {
       it('combines schema paths', () => {
         instance.schemas.push({
