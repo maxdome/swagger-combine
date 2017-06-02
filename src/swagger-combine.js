@@ -7,7 +7,7 @@ const _ = require('lodash');
 
 class SwaggerCombine {
   constructor(config, opts) {
-    this.config = config;
+    this.config = _.cloneDeep(config);
     this.opts = opts || {};
     this.apis = [];
     this.schemas = [];
