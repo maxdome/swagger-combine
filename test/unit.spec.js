@@ -322,8 +322,8 @@ describe('[Unit] swagger-combine.js', () => {
 
       it('renames security in pahts', () => {
         instance.renameSecurityDefinitions();
-        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.not.include({ test_auth: [] });
-        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.include({ renamed_auth: [] });
+        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.not.deep.include({ test_auth: [] });
+        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.deep.include({ renamed_auth: [] });
       });
     });
 
@@ -342,8 +342,8 @@ describe('[Unit] swagger-combine.js', () => {
         ];
 
         instance.addSecurityToPaths();
-        expect(instance.schemas[0].paths['/test/path/second'].get.security).to.include({ test_security: [] });
-        expect(instance.schemas[0].paths['/test/path/second'].post.security).to.include({ test_security: [] });
+        expect(instance.schemas[0].paths['/test/path/second'].get.security).to.deep.include({ test_security: [] });
+        expect(instance.schemas[0].paths['/test/path/second'].post.security).to.deep.include({ test_security: [] });
       });
 
       it('adds security to method in path', () => {
@@ -360,7 +360,7 @@ describe('[Unit] swagger-combine.js', () => {
         ];
 
         instance.addSecurityToPaths();
-        expect(instance.schemas[0].paths['/test/path/second'].get.security).to.include({ test_security: [] });
+        expect(instance.schemas[0].paths['/test/path/second'].get.security).to.deep.include({ test_security: [] });
         expect(instance.schemas[0].paths['/test/path/second'].post.security).to.not.be.ok;
       });
     });

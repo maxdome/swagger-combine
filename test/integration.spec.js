@@ -93,20 +93,20 @@ describe('[Integration] swagger-combine.js', () => {
     swaggerCombine(renameConfig).then(schema => {
       expect(schema.securityDefinitions.api_key).to.not.be.ok;
       expect(schema.securityDefinitions.KEY).to.be.ok;
-      expect(schema.paths['/store/inventory'].get.security).not.to.include({
+      expect(schema.paths['/store/inventory'].get.security).not.to.deep.include({
         api_key: [],
       });
-      expect(schema.paths['/store/inventory'].get.security).to.include({
+      expect(schema.paths['/store/inventory'].get.security).to.deep.include({
         KEY: [],
       });
     }));
 
   it('adds security to paths', () =>
     swaggerCombine(securityConfig).then(schema => {
-      expect(schema.paths['/store/order'].post.security).to.include({
+      expect(schema.paths['/store/order'].post.security).to.deep.include({
         petstore_auth: ['write:pets', 'read:pets'],
       });
-      expect(schema.paths['/store/order/{orderId}'].delete.security).to.include({
+      expect(schema.paths['/store/order/{orderId}'].delete.security).to.deep.include({
         petstore_auth: ['write:pets', 'read:pets'],
       });
     }));
