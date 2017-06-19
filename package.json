@@ -45,14 +45,14 @@
     "url-join": "^2.0.2"
   },
   "devDependencies": {
-    "@maxdome/prettier": "^1.0.3",
-    "chai": "^3.5.0",
+    "@maxdome/prettier": "^1.2.1",
+    "chai": "^4.0.2",
     "chai-http": "^3.0.0",
     "chai-somewhere": "^1.0.2",
     "express": "^4.15.3",
     "mocha": "^3.4.2",
-    "sinon": "^2.3.2",
-    "sinon-chai": "^2.10.0"
+    "sinon": "^2.3.4",
+    "sinon-chai": "^2.11.0"
   },
   "directories": {
     "example": "examples"

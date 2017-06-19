@@ -23,11 +23,7 @@ const config = (module.exports = {
     {
       url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml',
       paths: {
-        include: [
-          '/users/{userId}/publications',
-          '/publications/{publicationId}/posts',
-          '/me.get',
-        ],
+        include: ['/users/{userId}/publications', '/publications/{publicationId}/posts', '/me.get'],
         parameters: {
           include: {
             '/publications/{publicationId}/posts.post': 'publicationId',
@@ -39,7 +35,5 @@ const config = (module.exports = {
 });
 
 if (!module.parent) {
-  swaggerCombine(config)
-    .then(res => console.log(JSON.stringify(res, false, 2)))
-    .catch(err => console.error(err));
+  swaggerCombine(config).then(res => console.log(JSON.stringify(res, false, 2))).catch(err => console.error(err));
 }

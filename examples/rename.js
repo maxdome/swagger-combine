@@ -34,7 +34,5 @@ const config = (module.exports = {
 });
 
 if (!module.parent) {
-  swaggerCombine(config)
-    .then(res => console.log(JSON.stringify(res, false, 2)))
-    .catch(err => console.error(err));
+  swaggerCombine(config).then(res => console.log(JSON.stringify(res, false, 2))).catch(err => console.error(err));
 }

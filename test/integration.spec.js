@@ -59,19 +59,15 @@ describe('[Integration] swagger-combine.js', () => {
 
   it('filters out excluded parameteres', () =>
     swaggerCombine(filterConfig).then(schema => {
-      expect(
-        schema.paths['/pet/findByStatus'].get.parameters.some(
-          param => param.name === 'status'
-        )
-      ).to.be.false;
+      expect(schema.paths['/pet/findByStatus'].get.parameters.some(param => param.name === 'status')).to.be.false;
     }));
 
   it('filters only included parameteres', () =>
     swaggerCombine(filterConfig).then(schema => {
       expect(
-        schema.paths[
-          '/publications/{publicationId}/posts'
-        ].post.parameters.every(param => param.name === 'publicationId')
+        schema.paths['/publications/{publicationId}/posts'].post.parameters.every(
+          param => param.name === 'publicationId'
+        )
       ).to.be.true;
     }));
 
@@ -85,11 +81,7 @@ describe('[Integration] swagger-combine.js', () => {
     swaggerCombine(renameConfig).then(schema => {
       const tags = Object.values(schema.paths).reduce(
         (allTags, path) =>
-          allTags.concat(
-            Object.values(path)
-              .map(method => method.tags)
-              .reduce((a, b) => a.concat(b), [])
-          ),
+          allTags.concat(Object.values(path).map(method => method.tags).reduce((a, b) => a.concat(b), [])),
         []
       );
 
@@ -114,9 +106,9 @@ describe('[Integration] swagger-combine.js', () => {
       expect(schema.paths['/store/order'].post.security).to.include({
         petstore_auth: ['write:pets', 'read:pets'],
       });
-      expect(
-        schema.paths['/store/order/{orderId}'].delete.security
-      ).to.include({ petstore_auth: ['write:pets', 'read:pets'] });
+      expect(schema.paths['/store/order/{orderId}'].delete.security).to.include({
+        petstore_auth: ['write:pets', 'read:pets'],
+      });
     }));
 
   it('adds base to all paths of an API', () =>

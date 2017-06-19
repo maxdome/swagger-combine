@@ -130,9 +130,7 @@ describe('[Unit] swagger-combine.js', () => {
         ];
 
         instance.filterPaths();
-        expect(instance.schemas[0].paths).to.have.all.keys([
-          '/test/path/second',
-        ]);
+        expect(instance.schemas[0].paths).to.have.all.keys(['/test/path/second']);
         expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(1);
       });
 
@@ -146,16 +144,10 @@ describe('[Unit] swagger-combine.js', () => {
         ];
 
         instance.filterPaths();
-        expect(instance.schemas[0].paths).to.have.all.keys([
-          '/test/path/second',
-        ]);
-        expect(
-          instance.schemas[0].paths['/test/path/second']
-        ).to.have.all.keys(['get']);
+        expect(instance.schemas[0].paths).to.have.all.keys(['/test/path/second']);
+        expect(instance.schemas[0].paths['/test/path/second']).to.have.all.keys(['get']);
         expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(1);
-        expect(
-          Object.keys(instance.schemas[0].paths['/test/path/second'])
-        ).to.have.lengthOf(1);
+        expect(Object.keys(instance.schemas[0].paths['/test/path/second'])).to.have.lengthOf(1);
       });
 
       it('filters out excluded path', () => {
@@ -182,12 +174,8 @@ describe('[Unit] swagger-combine.js', () => {
         ];
 
         instance.filterPaths();
-        expect(instance.schemas[0].paths['/test/path/first']).to.not.have.keys(
-          'get'
-        );
-        expect(
-          Object.keys(instance.schemas[0].paths['/test/path/first'])
-        ).to.have.lengthOf(1);
+        expect(instance.schemas[0].paths['/test/path/first']).to.not.have.keys('get');
+        expect(Object.keys(instance.schemas[0].paths['/test/path/first'])).to.have.lengthOf(1);
         expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(2);
       });
     });
@@ -207,14 +195,9 @@ describe('[Unit] swagger-combine.js', () => {
         ];
 
         instance.filterParameters();
-        expect(
-          instance.schemas[0].paths['/test/path/first'].get.parameters
-        ).to.have.lengthOf(1);
-        expect(
-          instance.schemas[0].paths['/test/path/first'].get.parameters.every(
-            param => param.name === 'testParam'
-          )
-        ).to.be.true;
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters).to.have.lengthOf(1);
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters.every(param => param.name === 'testParam'))
+          .to.be.true;
       });
 
       it('filters included parameter for path', () => {
@@ -231,22 +214,12 @@ describe('[Unit] swagger-combine.js', () => {
         ];
 
         instance.filterParameters();
-        expect(
-          instance.schemas[0].paths['/test/path/first'].get.parameters
-        ).to.have.lengthOf(1);
-        expect(
-          instance.schemas[0].paths['/test/path/first'].post.parameters
-        ).to.have.lengthOf(1);
-        expect(
-          instance.schemas[0].paths['/test/path/first'].get.parameters.every(
-            param => param.name === 'testParam'
-          )
-        ).to.be.true;
-        expect(
-          instance.schemas[0].paths['/test/path/first'].post.parameters.every(
-            param => param.name === 'testParam'
-          )
-        ).to.be.true;
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters).to.have.lengthOf(1);
+        expect(instance.schemas[0].paths['/test/path/first'].post.parameters).to.have.lengthOf(1);
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters.every(param => param.name === 'testParam'))
+          .to.be.true;
+        expect(instance.schemas[0].paths['/test/path/first'].post.parameters.every(param => param.name === 'testParam'))
+          .to.be.true;
       });
 
       it('filters out excluded parameter for method in path', () => {
@@ -263,14 +236,9 @@ describe('[Unit] swagger-combine.js', () => {
         ];
 
         instance.filterParameters();
-        expect(
-          instance.schemas[0].paths['/test/path/first'].get.parameters
-        ).to.have.lengthOf(3);
-        expect(
-          instance.schemas[0].paths['/test/path/first'].get.parameters.some(
-            param => param.name === 'testParam'
-          )
-        ).to.be.false;
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters).to.have.lengthOf(3);
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters.some(param => param.name === 'testParam'))
+          .to.be.false;
       });
 
       it('filters out excluded parameter for path', () => {
@@ -287,22 +255,12 @@ describe('[Unit] swagger-combine.js', () => {
         ];
 
         instance.filterParameters();
-        expect(
-          instance.schemas[0].paths['/test/path/first'].get.parameters
-        ).to.have.lengthOf(3);
-        expect(
-          instance.schemas[0].paths['/test/path/first'].post.parameters
-        ).to.have.lengthOf(1);
-        expect(
-          instance.schemas[0].paths['/test/path/first'].get.parameters.some(
-            param => param.name === 'testParam'
-          )
-        ).to.be.false;
-        expect(
-          instance.schemas[0].paths['/test/path/first'].post.parameters.some(
-            param => param.name === 'testParam'
-          )
-        ).to.be.false;
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters).to.have.lengthOf(3);
+        expect(instance.schemas[0].paths['/test/path/first'].post.parameters).to.have.lengthOf(1);
+        expect(instance.schemas[0].paths['/test/path/first'].get.parameters.some(param => param.name === 'testParam'))
+          .to.be.false;
+        expect(instance.schemas[0].paths['/test/path/first'].post.parameters.some(param => param.name === 'testParam'))
+          .to.be.false;
       });
     });
 
@@ -320,9 +278,7 @@ describe('[Unit] swagger-combine.js', () => {
 
         instance.renamePaths();
         expect(instance.schemas[0].paths).to.not.have.keys('/test/path/first');
-        expect(instance.schemas[0].paths).to.have.any.keys(
-          '/test/path/renamed'
-        );
+        expect(instance.schemas[0].paths).to.have.any.keys('/test/path/renamed');
       });
     });
 
@@ -339,15 +295,9 @@ describe('[Unit] swagger-combine.js', () => {
         ];
 
         instance.renameTags();
-        expect(
-          instance.schemas[0].paths['/test/path/second'].get.tags
-        ).to.not.include('testTagFirst');
-        expect(
-          instance.schemas[0].paths['/test/path/second'].get.tags
-        ).to.include('testTagRenamed');
-        expect(
-          instance.schemas[0].paths['/test/path/second'].get.tags
-        ).to.have.lengthOf(2);
+        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.not.include('testTagFirst');
+        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.include('testTagRenamed');
+        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.have.lengthOf(2);
       });
     });
 
@@ -366,22 +316,14 @@ describe('[Unit] swagger-combine.js', () => {
 
       it('renames security definitions', () => {
         instance.renameSecurityDefinitions();
-        expect(instance.schemas[0].securityDefinitions).to.not.have.keys(
-          'test_auth'
-        );
-        expect(instance.schemas[0].securityDefinitions).to.have.keys(
-          'renamed_auth'
-        );
+        expect(instance.schemas[0].securityDefinitions).to.not.have.keys('test_auth');
+        expect(instance.schemas[0].securityDefinitions).to.have.keys('renamed_auth');
       });
 
       it('renames security in pahts', () => {
         instance.renameSecurityDefinitions();
-        expect(
-          instance.schemas[0].paths['/test/path/first'].post.security
-        ).to.not.include({ test_auth: [] });
-        expect(
-          instance.schemas[0].paths['/test/path/first'].post.security
-        ).to.include({ renamed_auth: [] });
+        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.not.include({ test_auth: [] });
+        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.include({ renamed_auth: [] });
       });
     });
 
@@ -400,12 +342,8 @@ describe('[Unit] swagger-combine.js', () => {
         ];
 
         instance.addSecurityToPaths();
-        expect(
-          instance.schemas[0].paths['/test/path/second'].get.security
-        ).to.include({ test_security: [] });
-        expect(
-          instance.schemas[0].paths['/test/path/second'].post.security
-        ).to.include({ test_security: [] });
+        expect(instance.schemas[0].paths['/test/path/second'].get.security).to.include({ test_security: [] });
+        expect(instance.schemas[0].paths['/test/path/second'].post.security).to.include({ test_security: [] });
       });
 
       it('adds security to method in path', () => {
@@ -422,11 +360,8 @@ describe('[Unit] swagger-combine.js', () => {
         ];
 
         instance.addSecurityToPaths();
-        expect(
-          instance.schemas[0].paths['/test/path/second'].get.security
-        ).to.include({ test_security: [] });
-        expect(instance.schemas[0].paths['/test/path/second'].post.security).to
-          .not.be.ok;
+        expect(instance.schemas[0].paths['/test/path/second'].get.security).to.include({ test_security: [] });
+        expect(instance.schemas[0].paths['/test/path/second'].post.security).to.not.be.ok;
       });
     });
 
@@ -441,11 +376,7 @@ describe('[Unit] swagger-combine.js', () => {
         ];
 
         instance.addBasePath();
-        expect(
-          Object.keys(instance.schemas[0].paths).every(path =>
-            /^\/base\/.*/.test(path)
-          )
-        ).to.be.ok;
+        expect(Object.keys(instance.schemas[0].paths).every(path => /^\/base\/.*/.test(path))).to.be.ok;
       });
     });
 
@@ -480,13 +411,8 @@ describe('[Unit] swagger-combine.js', () => {
         });
 
         instance.combineSchemas();
-        expect(
-          Object.keys(instance.combinedSchema.securityDefinitions)
-        ).to.have.length(2);
-        expect(instance.combinedSchema.securityDefinitions).to.have.all.keys([
-          'test_auth',
-          'schema_two_auth',
-        ]);
+        expect(Object.keys(instance.combinedSchema.securityDefinitions)).to.have.length(2);
+        expect(instance.combinedSchema.securityDefinitions).to.have.all.keys(['test_auth', 'schema_two_auth']);
       });
 
       it('throws an error if path name already exists', () => {
@@ -500,9 +426,7 @@ describe('[Unit] swagger-combine.js', () => {
           },
         });
 
-        expect(instance.combineSchemas.bind(instance)).to.throw(
-          /Name conflict in paths: \/test\/path\/first/
-        );
+        expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in paths: \/test\/path\/first/);
       });
 
       it('throws an error if security defintion name already exists', () => {
@@ -514,9 +438,7 @@ describe('[Unit] swagger-combine.js', () => {
           },
         });
 
-        expect(instance.combineSchemas.bind(instance)).to.throw(
-          /Name conflict in security definitions: test_auth/
-        );
+        expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in security definitions: test_auth/);
       });
     });
 
@@ -527,11 +449,7 @@ describe('[Unit] swagger-combine.js', () => {
         instance.combinedSchema.emptyThree = [];
 
         instance.removeEmptyFields();
-        expect(instance.combinedSchema).to.not.have.any.keys([
-          'empty',
-          'emptyTwo',
-          'emptyThree',
-        ]);
+        expect(instance.combinedSchema).to.not.have.any.keys(['empty', 'emptyTwo', 'emptyThree']);
       });
     });
 
@@ -544,22 +462,16 @@ describe('[Unit] swagger-combine.js', () => {
       });
 
       it('returns stringified combined schema', () => {
-        expect(instance.toString()).to.equal(
-          '{"test":"test","testTwo":["test"]}'
-        );
+        expect(instance.toString()).to.equal('{"test":"test","testTwo":["test"]}');
       });
 
       it('returns YAML string if specified', () => {
-        expect(instance.toString('yaml')).to.equal(
-          'test: test\ntestTwo:\n  - test\n'
-        );
+        expect(instance.toString('yaml')).to.equal('test: test\ntestTwo:\n  - test\n');
       });
 
       it('returns YAML string if spcified in opts', () => {
         instance.opts = { format: 'yaml' };
-        expect(instance.toString()).to.equal(
-          'test: test\ntestTwo:\n  - test\n'
-        );
+        expect(instance.toString()).to.equal('test: test\ntestTwo:\n  - test\n');
       });
     });
   });

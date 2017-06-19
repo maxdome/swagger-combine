@@ -38,9 +38,7 @@ class SwaggerCombine {
         this.apis = configSchema.apis || [];
         this.combinedSchema = _.omit(configSchema, 'apis');
 
-        return Promise.all(
-          this.apis.map(api => SwaggerParser.dereference(api.url, this.opts))
-        );
+        return Promise.all(this.apis.map(api => SwaggerParser.dereference(api.url, this.opts)));
       })
       .then(apis => {
         this.schemas = apis;
@@ -51,15 +49,9 @@ class SwaggerCombine {
   filterPaths() {
     this.schemas = this.schemas.map((schema, idx) => {
       if (this.apis[idx].paths) {
-        if (
-          this.apis[idx].paths.include &&
-          this.apis[idx].paths.include.length > 0
-        ) {
+        if (this.apis[idx].paths.include && this.apis[idx].paths.include.length > 0) {
           schema.paths = _.pick(schema.paths, this.apis[idx].paths.include);
-        } else if (
-          this.apis[idx].paths.exclude &&
-          this.apis[idx].paths.exclude.length > 0
-        ) {
+        } else if (this.apis[idx].paths.exclude && this.apis[idx].paths.exclude.length > 0) {
           schema.paths = _.omit(schema.paths, this.apis[idx].paths.exclude);
         }
       }
@@ -78,9 +70,7 @@ class SwaggerCombine {
 
         if (includeParameters && !_.isEmpty(includeParameters)) {
           _.forIn(includeParameters, (parameterToInclude, parameterPath) => {
-            const hasHttpMethod = /\.(get|put|post|delete|options|head|patch)$/i.test(
-              parameterPath
-            );
+            const hasHttpMethod = /\.(get|put|post|delete|options|head|patch)$/i.test(parameterPath);
             const pathInSchema = _.get(schema.paths, parameterPath);
 
             if (pathInSchema) {
@@ -101,9 +91,7 @@ class SwaggerCombine {
           });
         } else if (excludeParameters && !_.isEmpty(excludeParameters)) {
           _.forIn(excludeParameters, (parameterToExclude, parameterPath) => {
-            const hasHttpMethod = /\.(get|put|post|delete|options|head|patch)$/i.test(
-              parameterPath
-            );
+            const hasHttpMethod = /\.(get|put|post|delete|options|head|patch)$/i.test(parameterPath);
             const pathInSchema = _.get(schema.paths, parameterPath);
 
             if (pathInSchema) {
@@ -133,11 +121,7 @@ class SwaggerCombine {
 
   renamePaths() {
     this.schemas = this.schemas.map((schema, idx) => {
-      if (
-        this.apis[idx].paths &&
-        this.apis[idx].paths.rename &&
-        Object.keys(this.apis[idx].paths.rename).length > 0
-      ) {
+      if (this.apis[idx].paths && this.apis[idx].paths.rename && Object.keys(this.apis[idx].paths.rename).length > 0) {
         _.forIn(this.apis[idx].paths.rename, (renamePath, pathToRename) => {
           schema.paths = _.mapKeys(schema.paths, (value, curPath) => {
             if (pathToRename === curPath) {
@@ -157,23 +141,11 @@ class SwaggerCombine {
 
   renameTags() {
     this.schemas = this.schemas.map((schema, idx) => {
-      if (
-        this.apis[idx].tags &&
-        this.apis[idx].tags.rename &&
-        Object.keys(this.apis[idx].tags.rename).length > 0
-      ) {
+      if (this.apis[idx].tags && this.apis[idx].tags.rename && Object.keys(this.apis[idx].tags.rename).length > 0) {
         _.forIn(this.apis[idx].tags.rename, (newTagName, tagNameToRename) => {
           traverse(schema).forEach(function traverseSchema() {
-            if (
-              this.key === 'tags' &&
-              Array.isArray(this.node) &&
-              this.node.includes(tagNameToRename)
-            ) {
-              this.update(
-                this.node.map(
-                  tag => (tag === tagNameToRename ? newTagName : tag)
-                )
-              );
+            if (this.key === 'tags' && Array.isArray(this.node) && this.node.includes(tagNameToRename)) {
+              this.update(this.node.map(tag => (tag === tagNameToRename ? newTagName : tag)));
             }
           });
         });
@@ -192,38 +164,27 @@ class SwaggerCombine {
         this.apis[idx].securityDefinitions.rename &&
         Object.keys(this.apis[idx].securityDefinitions.rename).length > 0
       ) {
-        _.forIn(
-          this.apis[idx].securityDefinitions.rename,
-          (newName, curName) => {
-            if (_.has(schema.securityDefinitions, curName)) {
-              _.set(
-                schema.securityDefinitions,
-                newName,
-                schema.securityDefinitions[curName]
-              );
-              _.unset(schema.securityDefinitions, curName);
+        _.forIn(this.apis[idx].securityDefinitions.rename, (newName, curName) => {
+          if (_.has(schema.securityDefinitions, curName)) {
+            _.set(schema.securityDefinitions, newName, schema.securityDefinitions[curName]);
+            _.unset(schema.securityDefinitions, curName);
 
-              traverse(schema).forEach(function traverseSchema() {
-                if (
-                  this.key === 'security' &&
-                  Array.isArray(this.node) &&
-                  this.node.some(sec => !!sec[curName])
-                ) {
-                  this.update(
-                    this.node.map(sec => {
-                      if (_.has(sec, curName)) {
-                        _.set(sec, newName, sec[curName]);
-                        _.unset(sec, curName);
-                      }
+            traverse(schema).forEach(function traverseSchema() {
+              if (this.key === 'security' && Array.isArray(this.node) && this.node.some(sec => !!sec[curName])) {
+                this.update(
+                  this.node.map(sec => {
+                    if (_.has(sec, curName)) {
+                      _.set(sec, newName, sec[curName]);
+                      _.unset(sec, curName);
+                    }
 
-                      return sec;
-                    })
-                  );
-                }
-              });
-            }
+                    return sec;
+                  })
+                );
+              }
+            });
           }
-        );
+        });
       }
 
       return schema;
@@ -239,32 +200,26 @@ class SwaggerCombine {
         this.apis[idx].paths.security &&
         Object.keys(this.apis[idx].paths.security).length > 0
       ) {
-        _.forIn(
-          this.apis[idx].paths.security,
-          (securityDefinitions, pathForSecurity) => {
-            const hasHttpMethod = /\.(get|put|post|delete|options|head|patch)$/i.test(
-              pathForSecurity
-            );
-            const pathInSchema = _.get(schema.paths, pathForSecurity);
+        _.forIn(this.apis[idx].paths.security, (securityDefinitions, pathForSecurity) => {
+          const hasHttpMethod = /\.(get|put|post|delete|options|head|patch)$/i.test(pathForSecurity);
+          const pathInSchema = _.get(schema.paths, pathForSecurity);
 
-            if (pathInSchema) {
-              if (hasHttpMethod) {
+          if (pathInSchema) {
+            if (hasHttpMethod) {
+              _.forIn(securityDefinitions, (scope, type) => {
+                pathInSchema.security = pathInSchema.security || [];
+                pathInSchema.security.push({ [type]: scope });
+              });
+            } else {
+              _.forIn(pathInSchema, (properties, method) => {
                 _.forIn(securityDefinitions, (scope, type) => {
-                  pathInSchema.security = pathInSchema.security || [];
-                  pathInSchema.security.push({ [type]: scope });
+                  pathInSchema[method].security = pathInSchema[method].security || [];
+                  pathInSchema[method].security.push({ [type]: scope });
                 });
-              } else {
-                _.forIn(pathInSchema, (properties, method) => {
-                  _.forIn(securityDefinitions, (scope, type) => {
-                    pathInSchema[method].security = pathInSchema[method]
-                      .security || [];
-                    pathInSchema[method].security.push({ [type]: scope });
-                  });
-                });
-              }
+              });
             }
           }
-        );
+        });
       }
 
       return schema;
@@ -289,49 +244,33 @@ class SwaggerCombine {
 
   combineSchemas() {
     this.schemas.forEach(schema => {
-      const conflictingPaths = _.intersection(
-        _.keys(this.combinedSchema.paths),
-        _.keys(schema.paths)
-      );
+      const conflictingPaths = _.intersection(_.keys(this.combinedSchema.paths), _.keys(schema.paths));
       const conflictingSecurityDefs = _.intersection(
         _.keys(this.combinedSchema.securityDefinitions),
         _.keys(schema.securityDefinitions)
       );
 
       if (!_.isEmpty(conflictingPaths)) {
-        throw new Error(
-          `Name conflict in paths: ${conflictingPaths.join(', ')}`
-        );
+        throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')}`);
       }
 
       if (!_.isEmpty(conflictingSecurityDefs)) {
-        throw new Error(
-          `Name conflict in security definitions: ${conflictingSecurityDefs.join(', ')}`
-        );
+        throw new Error(`Name conflict in security definitions: ${conflictingSecurityDefs.join(', ')}`);
       }
 
-      _.defaultsDeep(
-        this.combinedSchema,
-        _.pick(schema, ['paths', 'securityDefinitions'])
-      );
+      _.defaultsDeep(this.combinedSchema, _.pick(schema, ['paths', 'securityDefinitions']));
     });
 
     return this;
   }
 
   removeEmptyFields() {
-    this.combinedSchema = _(this.combinedSchema)
-      .omitBy(_.isNil)
-      .omitBy(_.isEmpty)
-      .value();
+    this.combinedSchema = _(this.combinedSchema).omitBy(_.isNil).omitBy(_.isEmpty).value();
     return this;
   }
 
   toString(format = this.opts.format) {
-    if (
-      String(format).toLowerCase() === 'yaml' ||
-      String(format).toLowerCase() === 'yml'
-    ) {
+    if (String(format).toLowerCase() === 'yaml' || String(format).toLowerCase() === 'yml') {
       return $RefParser.YAML.stringify(this.combinedSchema);
     }
 
