@@ -1,3 +1,4 @@
+const nock = require('nock');
 const chai = require('chai');
 chai.use(require('chai-somewhere'));
 chai.use(require('chai-http'));
@@ -37,6 +38,20 @@ describe('[Integration] swagger-combine.js', () => {
     swaggerCombine(basicConfig).then(schema => {
       expect(schema).to.not.have.keys('other');
     }));
+
+  it('catches errors if `continueOnError` option is set to true and a swagger config is unreachable', () => {
+    nock('http://petstore.swagger.io').get('/v2/swagger.json').reply(500);
+
+    return swaggerCombine(basicConfig, { continueOnError: true });
+  });
+
+  it('catches errors if `continueOnError` option is set to true and a swagger config is invalid', () => {
+    nock('http://petstore.swagger.io').get('/v2/swagger.json').reply(200, {
+      swagger: 'invalid'
+    });
+
+    return swaggerCombine(basicConfig, { continueOnError: true });
+  });
 
   it('filters out excluded paths', () =>
     swaggerCombine(filterConfig).then(schema => {
@@ -131,5 +146,9 @@ describe('[Integration] swagger-combine.js', () => {
         expect(res).to.have.header('content-type', /^text\/yaml/);
         expect(res.text).to.include('paths:');
       }));
+  });
+
+  afterEach(() => {
+    nock.cleanAll();
   });
 });

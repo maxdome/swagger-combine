@@ -1,8 +1,8 @@
 const $RefParser = require('json-schema-ref-parser');
 const SwaggerParser = require('swagger-parser');
 const maybe = require('call-me-maybe');
-const urlJoin = require('url-join');
 const traverse = require('traverse');
+const urlJoin = require('url-join');
 const _ = require('lodash');
 
 class SwaggerCombine {
@@ -38,7 +38,13 @@ class SwaggerCombine {
         this.apis = configSchema.apis || [];
         this.combinedSchema = _.omit(configSchema, 'apis');
 
-        return Promise.all(this.apis.map(api => SwaggerParser.dereference(api.url, this.opts)));
+        return Promise.all(this.apis.map((api, idx) => SwaggerParser.dereference(api.url, this.opts).catch(err => {
+          if (this.opts.continueOnError) {
+            return;
+          }
+
+          throw err;
+        })));
       })
       .then(apis => {
         this.schemas = apis;
@@ -244,10 +250,10 @@ class SwaggerCombine {
 
   combineSchemas() {
     this.schemas.forEach(schema => {
-      const conflictingPaths = _.intersection(_.keys(this.combinedSchema.paths), _.keys(schema.paths));
+      const conflictingPaths = _.intersection(_.keys(this.combinedSchema.paths), _.keys(_.get(schema, 'paths')));
       const conflictingSecurityDefs = _.intersection(
         _.keys(this.combinedSchema.securityDefinitions),
-        _.keys(schema.securityDefinitions)
+        _.keys(_.get(schema, 'securityDefinitions'))
       );
 
       if (!_.isEmpty(conflictingPaths)) {

@@ -51,7 +51,8 @@
     "chai-somewhere": "^1.0.2",
     "express": "^4.15.3",
     "mocha": "^3.4.2",
-    "sinon": "^2.3.4",
+    "nock": "^9.0.13",
+    "sinon": "^2.3.7",
     "sinon-chai": "^2.11.0"
   },
   "directories": {

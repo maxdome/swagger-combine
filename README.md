@@ -337,8 +337,15 @@ Security can be specified per path using the `paths.security` field.
 #### options
 
 **`object`** *(optional)*
-  
-> See [JSON Schema $Ref Parser Options](https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/options.md) for a complete list of options.
+
+> Additional options
 
 * **format** - `string`
-Content type of the response. `yaml` or `json` *(default)*.
+
+    Content type of the response. `yaml` or `json` *(default)*.
+
+* **continueOnError** - `boolean`
+
+    Continue if Swagger configs cannot be resolved or are invalid (default: `false`). *No warning or error message is returned if this option is enabled.*
+
+> See [JSON Schema $Ref Parser Options](https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/options.md) for a list of options for the parser.
