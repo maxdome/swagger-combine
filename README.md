@@ -51,7 +51,7 @@ The middleware runs the combine function on every request. Since Swagger documen
 
 * **Swagger Combine** requires one configuration schema which resembles a standard Swagger schema except for an additional `apis` field.
 * Since this module uses [Swagger Parser](https://github.com/BigstickCarpet/swagger-parser) and [JSON Schema $Ref Parser](https://github.com/BigstickCarpet/json-schema-ref-parser) internally the schema can be passed to **Swagger Combine** as a file path, a URL or a JS object.
-* All `$ref` fields in the configuration schema are getting dereferenced. 
+* All `$ref` fields in the configuration schema are getting dereferenced.
 * The default path for the configuration file is `docs/swagger.json`.
 * The configuration file can be `JSON` or `YAML`.
 
@@ -103,7 +103,7 @@ apis:
 
 ### Filtering Paths
 
-Paths can be filtered by using an array of paths to `exclude` or `include`. 
+Paths can be filtered by using an array of paths to `exclude` or `include`.
 
 ```json
 {
@@ -230,6 +230,38 @@ Tags can be renamed in the same manner as paths, using the `tags.rename` field.
 }
 ```
 
+### Adding Tags
+
+Tags can be added to all operations in a schema, using the `tags.add` field.
+
+```json
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Swagger Combine Rename Example",
+    "version": "1.0.0"
+  },
+  "apis": [
+    {
+      "url": "http://petstore.swagger.io/v2/swagger.json",
+      "tags": {
+        "add": [
+          "pet"
+        ]
+      }
+    },
+    {
+      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml",
+      "tags": {
+        "add": [
+          "medium"
+        ]
+      }
+    }
+  ]
+}
+```
+
 ### Renaming Security Definitions
 
 Security definitions can be renamed like paths and tags in the `securityDefinitions.rename` field. All usages of the security definition in the paths are renamed as well.
@@ -301,11 +333,11 @@ Security can be specified per path using the `paths.security` field.
 
 **Returns** `promise` with dereferenced and combined schema.
 
-#### config 
+#### config
 
 **`string|object`**
 
-> URL/path to config schema file or config schema object. 
+> URL/path to config schema file or config schema object.
 >
 > **Default:** `docs/swagger.json`
 
@@ -326,11 +358,11 @@ Security can be specified per path using the `paths.security` field.
 
 **Returns** `function(req, res, next)` for usage as middleware.
 
-#### config 
+#### config
 
 **`string|object`**
 
-> URL/path to config schema file or config schema object. 
+> URL/path to config schema file or config schema object.
 >
 > **Default:** `docs/swagger.json`
 
