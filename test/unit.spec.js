@@ -301,6 +301,27 @@ describe('[Unit] swagger-combine.js', () => {
       });
     });
 
+    describe('addTags()', () => {
+      it('adds tags', () => {
+        instance.apis = [
+          {
+            tags: {
+              add: [
+                'newTag',
+              ],
+            },
+          },
+        ];
+
+        instance.addTags();
+        expect(instance.schemas[0].paths['/test/path/first'].get.tags).to.include('newTag');
+        expect(instance.schemas[0].paths['/test/path/first'].post.tags).to.include('newTag');
+        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.include('newTag');
+        expect(instance.schemas[0].paths['/test/path/second'].post.tags).to.include('newTag');
+        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.have.lengthOf(3);
+      });
+    });
+
     describe('renameSecurityDefinitions()', () => {
       beforeEach(() => {
         instance.apis = [
