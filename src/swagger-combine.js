@@ -154,7 +154,7 @@ class SwaggerCombine {
         _.forIn(this.apis[idx].tags.rename, (newTagName, tagNameToRename) => {
           traverse(schema).forEach(function traverseSchema() {
             if (this.key === 'tags' && Array.isArray(this.node) && this.node.includes(tagNameToRename)) {
-              this.update(this.node.map(tag => (tag === tagNameToRename ? newTagName : tag)));
+              this.update(_.uniq(this.node.map(tag => (tag === tagNameToRename ? newTagName : tag))));
             }
           });
         });
@@ -173,7 +173,7 @@ class SwaggerCombine {
           traverse(schema).forEach(function traverseSchema() {
             if (this.parent && this.parent.parent && this.parent.parent.key === 'paths' && operationTypes.includes(this.key)) {
               const newTags = (this.node.tags && Array.isArray(this.node.tags))
-                ? this.node.tags.concat(newTagName)
+                ? _.uniq(this.node.tags.concat(newTagName))
                 : [newTagName];
 
               this.update(Object.assign({}, this.node, { tags: newTags }));
