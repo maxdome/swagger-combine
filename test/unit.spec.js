@@ -329,9 +329,7 @@ describe('[Unit] swagger-combine.js', () => {
         instance.apis = [
           {
             tags: {
-              add: [
-                'newTag',
-              ],
+              add: ['newTag'],
             },
           },
         ];
@@ -350,9 +348,7 @@ describe('[Unit] swagger-combine.js', () => {
         instance.apis = [
           {
             tags: {
-              add: [
-                'testTagFirst',
-              ],
+              add: ['testTagFirst'],
             },
           },
         ];

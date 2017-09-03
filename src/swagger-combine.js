@@ -41,13 +41,17 @@ class SwaggerCombine {
         this.apis = configSchema.apis || [];
         this.combinedSchema = _.omit(configSchema, 'apis');
 
-        return Promise.all(this.apis.map((api, idx) => SwaggerParser.dereference(api.url, this.opts).catch(err => {
-          if (this.opts.continueOnError) {
-            return;
-          }
+        return Promise.all(
+          this.apis.map((api, idx) =>
+            SwaggerParser.dereference(api.url, this.opts).catch(err => {
+              if (this.opts.continueOnError) {
+                return;
+              }
 
-          throw err;
-        })));
+              throw err;
+            })
+          )
+        );
       })
       .then(apis => {
         this.schemas = apis;
@@ -171,10 +175,16 @@ class SwaggerCombine {
       if (this.apis[idx].tags && this.apis[idx].tags.add && this.apis[idx].tags.add.length > 0) {
         this.apis[idx].tags.add.forEach(newTagName => {
           traverse(schema).forEach(function traverseSchema() {
-            if (this.parent && this.parent.parent && this.parent.parent.key === 'paths' && operationTypes.includes(this.key)) {
-              const newTags = (this.node.tags && Array.isArray(this.node.tags))
-                ? _.uniq(this.node.tags.concat(newTagName))
-                : [newTagName];
+            if (
+              this.parent &&
+              this.parent.parent &&
+              this.parent.parent.key === 'paths' &&
+              operationTypes.includes(this.key)
+            ) {
+              const newTags =
+                this.node.tags && Array.isArray(this.node.tags)
+                  ? _.uniq(this.node.tags.concat(newTagName))
+                  : [newTagName];
 
               this.update(Object.assign({}, this.node, { tags: newTags }));
             }
@@ -296,7 +306,10 @@ class SwaggerCombine {
   }
 
   removeEmptyFields() {
-    this.combinedSchema = _(this.combinedSchema).omitBy(_.isNil).omitBy(_.isEmpty).value();
+    this.combinedSchema = _(this.combinedSchema)
+      .omitBy(_.isNil)
+      .omitBy(_.isEmpty)
+      .value();
     return this;
   }
 

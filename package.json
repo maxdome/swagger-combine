@@ -7,7 +7,7 @@
     "test": "mocha test/*.spec.js",
     "test:integration": "mocha test/integration.spec.js",
     "test:unit": "mocha test/unit.spec.js",
-    "fmt": "maxdome-prettier '{examples,src,test}/**/*.js'",
+    "fmt": "maxdome-prettier '{src,test}/**/*.js'",
     "prepush": "npm test"
   },
   "keywords": [

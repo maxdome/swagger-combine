@@ -43,15 +43,19 @@ describe('[Integration] swagger-combine.js', () => {
     }));
 
   it('catches errors if `continueOnError` option is set to true and a swagger config is unreachable', () => {
-    nock('http://petstore.swagger.io').get('/v2/swagger.json').reply(500);
+    nock('http://petstore.swagger.io')
+      .get('/v2/swagger.json')
+      .reply(500);
 
     return swaggerCombine(basicConfig, { continueOnError: true });
   });
 
   it('catches errors if `continueOnError` option is set to true and a swagger config is invalid', () => {
-    nock('http://petstore.swagger.io').get('/v2/swagger.json').reply(200, {
-      swagger: 'invalid'
-    });
+    nock('http://petstore.swagger.io')
+      .get('/v2/swagger.json')
+      .reply(200, {
+        swagger: 'invalid',
+      });
 
     return swaggerCombine(basicConfig, { continueOnError: true });
   });
@@ -99,7 +103,11 @@ describe('[Integration] swagger-combine.js', () => {
     swaggerCombine(renameConfig).then(schema => {
       const tags = Object.values(schema.paths).reduce(
         (allTags, path) =>
-          allTags.concat(Object.values(path).map(method => method.tags).reduce((a, b) => a.concat(b), [])),
+          allTags.concat(
+            Object.values(path)
+              .map(method => method.tags)
+              .reduce((a, b) => a.concat(b), [])
+          ),
         []
       );
 
@@ -110,21 +118,22 @@ describe('[Integration] swagger-combine.js', () => {
   it('adds tags', () =>
     swaggerCombine(addTagsConfig).then(schema => {
       const allOperations = Object.values(schema.paths).reduce(
-        (operations, path) => (
+        (operations, path) =>
           operations.concat(
-            Object.keys(path).filter(key => operationTypes.includes(key)).map(key => path[key])
-          )
-        ),
+            Object.keys(path)
+              .filter(key => operationTypes.includes(key))
+              .map(key => path[key])
+          ),
         []
       );
 
       const countAllOperations = allOperations.length;
-      const countTaggedOperations = allOperations.filter(operation => (
-        operation.tags.includes('pet') || operation.tags.includes('medium')
-      )).length;
-      const countDoubleTaggedOperations = allOperations.filter(operation => (
-        operation.tags.includes('pet') && operation.tags.includes('medium')
-      )).length;
+      const countTaggedOperations = allOperations.filter(
+        operation => operation.tags.includes('pet') || operation.tags.includes('medium')
+      ).length;
+      const countDoubleTaggedOperations = allOperations.filter(
+        operation => operation.tags.includes('pet') && operation.tags.includes('medium')
+      ).length;
 
       expect(countTaggedOperations).to.equal(countAllOperations);
       expect(countDoubleTaggedOperations).to.equal(0);
@@ -160,18 +169,24 @@ describe('[Integration] swagger-combine.js', () => {
 
   describe('middleware', () => {
     it('returns a JSON schema', () =>
-      chai.request(app).get('/swagger.json').then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.json;
-        expect(res.body.paths).to.be.ok;
-      }));
+      chai
+        .request(app)
+        .get('/swagger.json')
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body.paths).to.be.ok;
+        }));
 
     it('returns a YAML schema', () =>
-      chai.request(app).get('/swagger.yaml').then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.have.header('content-type', /^text\/yaml/);
-        expect(res.text).to.include('paths:');
-      }));
+      chai
+        .request(app)
+        .get('/swagger.yaml')
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.have.header('content-type', /^text\/yaml/);
+          expect(res.text).to.include('paths:');
+        }));
   });
 
   afterEach(() => {
