@@ -57,6 +57,12 @@ describe('[Unit] swagger-combine.js', () => {
                   },
                 ],
               },
+              parameters: [
+                {
+                  name: 'sharedParam',
+                  in: 'query',
+                },
+              ],
             },
             '/test/path/second': {
               get: {
@@ -175,7 +181,7 @@ describe('[Unit] swagger-combine.js', () => {
 
         instance.filterPaths();
         expect(instance.schemas[0].paths['/test/path/first']).to.not.have.keys('get');
-        expect(Object.keys(instance.schemas[0].paths['/test/path/first'])).to.have.lengthOf(1);
+        expect(Object.keys(instance.schemas[0].paths['/test/path/first'])).to.have.lengthOf(2);
         expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(2);
       });
     });
@@ -297,6 +303,67 @@ describe('[Unit] swagger-combine.js', () => {
         instance.renameTags();
         expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.not.include('testTagFirst');
         expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.include('testTagRenamed');
+        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.have.lengthOf(2);
+      });
+
+      it('filters out duplicate tags', () => {
+        instance.apis = [
+          {
+            tags: {
+              rename: {
+                testTagFirst: 'testTagSecond',
+              },
+            },
+          },
+        ];
+
+        instance.renameTags();
+        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.not.include('testTagFirst');
+        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.include('testTagSecond');
+        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.have.lengthOf(1);
+      });
+    });
+
+    describe('addTags()', () => {
+      it('adds tags', () => {
+        instance.apis = [
+          {
+            tags: {
+              add: [
+                'newTag',
+              ],
+            },
+          },
+        ];
+
+        instance.addTags();
+        expect(instance.schemas[0].paths['/test/path/first'].get.tags).to.include('newTag');
+        expect(instance.schemas[0].paths['/test/path/first'].post.tags).to.include('newTag');
+        expect(instance.schemas[0].paths['/test/path/first'].parameters).to.have.lengthOf(1);
+
+        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.include('newTag');
+        expect(instance.schemas[0].paths['/test/path/second'].post.tags).to.include('newTag');
+        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.have.lengthOf(3);
+      });
+
+      it('filters out duplicate tags', () => {
+        instance.apis = [
+          {
+            tags: {
+              add: [
+                'testTagFirst',
+              ],
+            },
+          },
+        ];
+
+        instance.addTags();
+        expect(instance.schemas[0].paths['/test/path/first'].get.tags).to.include('testTagFirst');
+        expect(instance.schemas[0].paths['/test/path/first'].post.tags).to.include('testTagFirst');
+        expect(instance.schemas[0].paths['/test/path/first'].parameters).to.have.lengthOf(1);
+
+        expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.include('testTagFirst');
+        expect(instance.schemas[0].paths['/test/path/second'].post.tags).to.include('testTagFirst');
         expect(instance.schemas[0].paths['/test/path/second'].get.tags).to.have.lengthOf(2);
       });
     });

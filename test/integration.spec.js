@@ -6,11 +6,14 @@ chai.use(require('chai-http'));
 const expect = chai.expect;
 const swaggerCombine = require('../src/swagger-combine');
 const pkg = require('../package.json');
+const addTagsConfig = require('../examples/add-tags');
 const basicConfig = require('../examples/basic');
 const filterConfig = require('../examples/filter');
 const renameConfig = require('../examples/rename');
 const securityConfig = require('../examples/security');
 const app = require('../examples/middleware');
+
+const operationTypes = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch'];
 
 describe('[Integration] swagger-combine.js', () => {
   it('resolves $refs in config schema', () =>
@@ -102,6 +105,29 @@ describe('[Integration] swagger-combine.js', () => {
 
       expect(tags).to.not.include('Users');
       expect(tags).to.include('People');
+    }));
+
+  it('adds tags', () =>
+    swaggerCombine(addTagsConfig).then(schema => {
+      const allOperations = Object.values(schema.paths).reduce(
+        (operations, path) => (
+          operations.concat(
+            Object.keys(path).filter(key => operationTypes.includes(key)).map(key => path[key])
+          )
+        ),
+        []
+      );
+
+      const countAllOperations = allOperations.length;
+      const countTaggedOperations = allOperations.filter(operation => (
+        operation.tags.includes('pet') || operation.tags.includes('medium')
+      )).length;
+      const countDoubleTaggedOperations = allOperations.filter(operation => (
+        operation.tags.includes('pet') && operation.tags.includes('medium')
+      )).length;
+
+      expect(countTaggedOperations).to.equal(countAllOperations);
+      expect(countDoubleTaggedOperations).to.equal(0);
     }));
 
   it('renames security definitions', () =>
