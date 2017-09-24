@@ -1,5 +1,5 @@
 const app = (module.exports = require('express')());
-const swaggerCombine = require('../src/swagger-combine');
+const swaggerCombine = require('../src');
 
 const basicConfig = require('./basic');
 

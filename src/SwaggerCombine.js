@@ -1,6 +1,5 @@
 const $RefParser = require('json-schema-ref-parser');
 const SwaggerParser = require('swagger-parser');
-const maybe = require('call-me-maybe');
 const traverse = require('traverse');
 const urlJoin = require('url-join');
 const _ = require('lodash');
@@ -322,28 +321,4 @@ class SwaggerCombine {
   }
 }
 
-function swaggerCombine(config = 'docs/swagger.json', opts, cb) {
-  if (_.isFunction(opts)) {
-    cb = opts;
-    opts = null;
-  }
-
-  return maybe(cb, new SwaggerCombine(config, opts).combineAndReturn());
-}
-
-swaggerCombine.middleware = (config, opts = {}) => (req, res, next) => {
-  new SwaggerCombine(config, opts)
-    .combine()
-    .then(sc => {
-      if (opts && (opts.format === 'yaml' || opts.format === 'yml')) {
-        return res.type('yaml').send(sc.toString());
-      }
-
-      res.json(sc.combinedSchema);
-    })
-    .catch(err => next(err));
-};
-
-swaggerCombine.SwaggerCombine = SwaggerCombine;
-
-module.exports = swaggerCombine;
+module.exports = SwaggerCombine;

@@ -4,7 +4,7 @@ chai.use(require('chai-somewhere'));
 chai.use(require('chai-http'));
 
 const expect = chai.expect;
-const swaggerCombine = require('../src/swagger-combine');
+const swaggerCombine = require('../src');
 const pkg = require('../package.json');
 const addTagsConfig = require('../examples/add-tags');
 const basicConfig = require('../examples/basic');

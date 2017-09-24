@@ -1,4 +1,4 @@
-const swaggerCombine = require('../src/swagger-combine');
+const swaggerCombine = require('../src');
 
 const config = (module.exports = {
   swagger: '2.0',

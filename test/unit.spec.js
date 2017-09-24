@@ -4,7 +4,7 @@ chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
 
-const swaggerCombine = require('../src/swagger-combine');
+const swaggerCombine = require('../src');
 
 const sandbox = sinon.sandbox.create();
 let instance;
