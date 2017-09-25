@@ -2,7 +2,7 @@ const _ = require('lodash');
 const maybe = require('call-me-maybe');
 
 const SwaggerCombine = require('./SwaggerCombine');
-const middleware = require('./middleware');
+const { middleware, middlewareAsync } = require('./middleware');
 
 function swaggerCombine(config = 'docs/swagger.json', opts, cb) {
   if (_.isFunction(opts)) {
@@ -15,5 +15,6 @@ function swaggerCombine(config = 'docs/swagger.json', opts, cb) {
 
 swaggerCombine.SwaggerCombine = SwaggerCombine;
 swaggerCombine.middleware = middleware;
+swaggerCombine.middlewareAsync = middlewareAsync;
 
 module.exports = swaggerCombine;

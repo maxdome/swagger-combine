@@ -11,11 +11,11 @@ const basicConfig = require('../examples/basic');
 const filterConfig = require('../examples/filter');
 const renameConfig = require('../examples/rename');
 const securityConfig = require('../examples/security');
-const app = require('../examples/middleware');
+const { app, app2 } = require('../examples/middleware');
 
 const operationTypes = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch'];
 
-describe('[Integration] swagger-combine.js', () => {
+describe('[Integration] SwaggerCombine.js', () => {
   it('resolves $refs in config schema', () =>
     swaggerCombine(basicConfig).then(schema => {
       expect(schema.info.version).to.equal(pkg.version);
@@ -167,6 +167,12 @@ describe('[Integration] swagger-combine.js', () => {
       expect(schema.paths).to.have.any.key('/bahn/betriebsstellen');
     }));
 
+  afterEach(() => {
+    nock.cleanAll();
+  });
+});
+
+describe('[Integration] middleware.js', () => {
   describe('middleware', () => {
     it('returns a JSON schema', () =>
       chai
@@ -189,7 +195,25 @@ describe('[Integration] swagger-combine.js', () => {
         }));
   });
 
-  afterEach(() => {
-    nock.cleanAll();
+  describe('middlewareAsync', () => {
+    it('returns a JSON schema', () =>
+      chai
+        .request(app2)
+        .get('/swagger.json')
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body.paths).to.be.ok;
+        }));
+
+    it('returns a YAML schema', () =>
+      chai
+        .request(app2)
+        .get('/swagger.yaml')
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.have.header('content-type', /^text\/yaml/);
+          expect(res.text).to.include('paths:');
+        }));
   });
 });
