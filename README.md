@@ -20,7 +20,7 @@ $ npm install --save swagger-combine
 const swaggerCombine = require('swagger-combine');
 
 swaggerCombine('docs/swagger.json')
-    .then(combinedSchema => console.log(JSON.stringify(combinedSchema)))
+    .then(res => console.log(JSON.stringify(res)))
     .catch(err => console.error(err));
 ```
 
@@ -29,8 +29,7 @@ swaggerCombine('docs/swagger.json')
 ```js
 swaggerCombine('docs/swagger.json', (err, res) => {
   if (err) console.error(err);
-
-  console.log(JSON.stringify(res));
+  else console.log(JSON.stringify(res));
 });
 ```
 
@@ -46,6 +45,26 @@ app.listen(3333);
 ```
 
 The middleware runs the combine function on every request. Since Swagger documentations tend not to change that frequently, the use of a caching mechanism like [apicache](https://github.com/kwhitley/apicache) is encouraged in conjungtion with this middleware.
+
+### Async Middleware
+
+```js
+const swaggerCombine = require('swagger-combine');
+const app = require('express')();
+
+(async function() {
+  try {
+    app.get('/swagger.json', await swaggerCombine.middlewareAsync('docs/swagger.json'));
+    app.get('/swagger.yaml', await swaggerCombine.middlewareAsync('docs/swagger.json', { format: 'yaml' }));
+  } catch (e) {
+    console.error(e);
+  }
+
+  app.listen(3333);
+})();
+
+```
+
 
 ## Configuration
 

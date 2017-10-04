@@ -1,4 +1,4 @@
-const swaggerCombine = require('../src/swagger-combine');
+const swaggerCombine = require('../src');
 
 const config = (module.exports = {
   swagger: '2.0',
@@ -30,11 +30,7 @@ if (!module.parent) {
 
   /* Using a callback */
   swaggerCombine(config, (err, res) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-
-    console.log(JSON.stringify(res, false, 2));
+    if (err) console.error(err);
+    else console.log(JSON.stringify(res, false, 2));
   });
 }

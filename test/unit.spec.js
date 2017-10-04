@@ -4,12 +4,12 @@ chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
 
-const swaggerCombine = require('../src/swagger-combine');
+const swaggerCombine = require('../src');
 
 const sandbox = sinon.sandbox.create();
 let instance;
 
-describe('[Unit] swagger-combine.js', () => {
+describe('[Unit] SwaggerCombine.js', () => {
   describe('Instance', () => {
     beforeEach(() => {
       instance = new swaggerCombine.SwaggerCombine();
@@ -538,10 +538,29 @@ describe('[Unit] swagger-combine.js', () => {
       });
     });
   });
+});
 
-  describe('Middleware', () => {
+describe('[Unit] middleware.js', () => {
+  describe('middleware()', () => {
     it('is exposed', () => {
       expect(swaggerCombine.middleware).to.be.a('function');
+    });
+
+    it('returns a middleware function', () => {
+      expect(swaggerCombine.middleware({})).to.be.a('function');
+    });
+  });
+
+  describe('middlewareAsync()', () => {
+    it('is exposed', () => {
+      expect(swaggerCombine.middlewareAsync).to.be.a('function');
+    });
+
+    it('returns a promise yielding a middleware', async () => {
+      const mw = swaggerCombine.middlewareAsync({});
+
+      expect(mw).to.be.a('promise');
+      return expect(await mw).to.be.a('function');
     });
   });
 });

@@ -52,10 +52,13 @@
     "express": "^4.15.4",
     "mocha": "^3.5.0",
     "nock": "^9.0.14",
-    "sinon": "^3.2.1",
+    "sinon": "^4.0.0",
     "sinon-chai": "^2.13.0"
   },
   "directories": {
     "example": "examples"
+  },
+  "engines": {
+    "node": ">=7.6.0"
   }
 }
