@@ -346,6 +346,56 @@ Security can be specified per path using the `paths.security` field.
 }
 ```
 
+### Authentication & Request Headers
+
+To retrieve Swagger schemas that are access protected, basic auth information (username and password) or any headers to be sent with the http request can be specified:
+
+```json
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Swagger Combine Authentication Example",
+    "version": "1.0.0"
+  },
+  "apis": [
+    {
+      "url": "http://petstore.swagger.io/v2/swagger.json",
+      "resolve": {
+        "http": {
+          "auth": {
+            "username": "admin",
+            "password": "secret12345"
+          }
+        }
+      }
+    },
+    {
+      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml",
+      "resolve": {
+        "http": {
+          "headers": {
+            "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6ImFkbWluIiwiYWRtaW4iOnRydWV9.44lJS0jlltzcglq7vgjXMXYRTecBxseN3Dec_LO_osI"
+          }
+        }
+      }
+    },
+    {
+      "url": "https://api.apis.guru/v2/specs/deutschebahn.com/betriebsstellen/v1/swagger.json",
+      "resolve": {
+        "http": {
+          "headers": {
+            "authorization": "Basic YWRtaW46c2VjcmV0MTIz"
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
+For all possible resolve options have a look at the [documentation of json-schema-ref-parser](https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/options.md#resolve-options).
+
+
 ## API
 
 ### swaggerCombine(config, [options], [callback])
