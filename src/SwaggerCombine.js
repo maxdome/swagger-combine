@@ -41,15 +41,28 @@ class SwaggerCombine {
         this.combinedSchema = _.omit(configSchema, 'apis');
 
         return Promise.all(
-          this.apis.map((api, idx) =>
-            SwaggerParser.dereference(api.url, this.opts).catch(err => {
-              if (this.opts.continueOnError) {
-                return;
-              }
+          this.apis.map((api, idx) => {
+            const opts = _.cloneDeep(this.opts);
+            opts.resolve = Object.assign({}, opts.resolve, api.resolve);
 
-              throw err;
-            })
-          )
+            if (_.has(opts, 'resolve.http.auth.username') && _.has(opts, 'resolve.http.auth.password')) {
+              const basicAuth =
+                'Basic ' +
+                new Buffer(`${opts.resolve.http.auth.username}:${opts.resolve.http.auth.password}`).toString('base64');
+              _.set(opts, 'resolve.http.headers.authorization', basicAuth);
+            }
+
+            return $RefParser
+              .dereference(api.url, opts)
+              .then(res => SwaggerParser.dereference(res, opts))
+              .catch(err => {
+                if (this.opts.continueOnError) {
+                  return;
+                }
+
+                throw err;
+              });
+          })
         );
       })
       .then(apis => {

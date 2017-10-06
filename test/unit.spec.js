@@ -1,4 +1,5 @@
 const chai = require('chai');
+const http = require('http');
 const sinon = require('sinon');
 chai.use(require('sinon-chai'));
 
@@ -123,6 +124,81 @@ describe('[Unit] SwaggerCombine.js', () => {
           expect(schema).to.eql({ test: 'test' });
         });
       });
+    });
+
+    describe('load()', () => {
+      beforeEach(() => {
+        sandbox.stub(http, 'get');
+      });
+
+      it('transforms auth to authorization header and sends it on http request', () => {
+        instance.config = {
+          apis: [
+            {
+              url: 'http://test/swagger.json',
+              resolve: {
+                http: {
+                  auth: {
+                    username: 'admin',
+                    password: 'secret12345',
+                  },
+                },
+              },
+            },
+          ],
+        };
+
+        return instance
+          .load()
+          .then(() => {
+            throw new Error('Should fail');
+          })
+          .catch(err => {
+            expect(http.get).to.have.been.calledWithMatch(
+              sinon.match({
+                headers: {
+                  authorization: sinon.match.string,
+                },
+              })
+            );
+          });
+      });
+
+      it('sets authorization headers on http request', () => {
+        const token =
+          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6ImFkbWluIiwiYWRtaW4iOnRydWV9.44lJS0jlltzcglq7vgjXMXYRTecBxseN3Dec_LO_osI';
+        instance.config = {
+          apis: [
+            {
+              url: 'http://test/swagger.json',
+              resolve: {
+                http: {
+                  headers: {
+                    authorization: token,
+                  },
+                },
+              },
+            },
+          ],
+        };
+
+        return instance
+          .load()
+          .then(() => {
+            throw new Error('Should fail');
+          })
+          .catch(err => {
+            expect(http.get).to.have.been.calledWithMatch(
+              sinon.match({
+                headers: {
+                  authorization: token,
+                },
+              })
+            );
+          });
+      });
+
+      afterEach(() => sandbox.restore());
     });
 
     describe('filterPaths()', () => {

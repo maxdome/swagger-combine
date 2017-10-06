@@ -16,15 +16,13 @@ exports.middleware = (config, opts = {}) => {
 };
 
 exports.middlewareAsync = (config, opts = {}) => {
-  return new SwaggerCombine(config, opts)
-    .combine()
-    .then(sc => {
-      return function (req, res, next) {
-        if (opts && (opts.format === 'yaml' || opts.format === 'yml')) {
-          return res.type('yaml').send(sc.toString());
-        }
-
-        res.json(sc.combinedSchema);
+  return new SwaggerCombine(config, opts).combine().then(sc => {
+    return function(req, res, next) {
+      if (opts && (opts.format === 'yaml' || opts.format === 'yml')) {
+        return res.type('yaml').send(sc.toString());
       }
-    });
+
+      res.json(sc.combinedSchema);
+    };
+  });
 };
