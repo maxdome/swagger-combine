@@ -400,3 +400,15 @@ Security can be specified per path using the `paths.security` field.
     Continue if Swagger configs cannot be resolved or are invalid (default: `false`). *No warning or error message is returned if this option is enabled.*
 
 > See [JSON Schema $Ref Parser Options](https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/options.md) for a list of options for the parser.
+
+### swaggerCombine.middlewareAsync(config, [options])
+
+**Returns** a `promise` yielding a `function(req, res, next)` for usage as middleware.
+
+#### config
+
+*see above*
+
+#### options
+
+*see above*
