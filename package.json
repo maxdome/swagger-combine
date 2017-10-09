@@ -4,9 +4,9 @@
   "description": "Combines multiple Swagger schemas into one dereferenced schema",
   "main": "src/swagger-combine.js",
   "scripts": {
-    "test": "mocha test/*.spec.js",
-    "test:integration": "mocha test/integration.spec.js",
-    "test:unit": "mocha test/unit.spec.js",
+    "test": "mocha --exit test/*.spec.js",
+    "test:integration": "mocha --exit test/integration.spec.js",
+    "test:unit": "mocha --exit test/unit.spec.js",
     "fmt": "maxdome-prettier '{src,test}/**/*.js'",
     "prepush": "npm test"
   },
@@ -18,7 +18,7 @@
     "documentation"
   ],
   "author": {
-    "name": "Maxdome",
+    "name": "maxdome",
     "url": "https://www.maxdome.de"
   },
   "contributors": [
@@ -50,7 +50,7 @@
     "chai-http": "^3.0.0",
     "chai-somewhere": "^1.0.2",
     "express": "^4.16.1",
-    "mocha": "^3.5.0",
+    "mocha": "^4.0.1",
     "nock": "^9.0.22",
     "sinon": "^4.0.0",
     "sinon-chai": "^2.14.0"
