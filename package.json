@@ -2,7 +2,7 @@
   "name": "swagger-combine",
   "version": "0.12.0",
   "description": "Combines multiple Swagger schemas into one dereferenced schema",
-  "main": "src/swagger-combine.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "mocha --exit test/*.spec.js",
     "test:integration": "mocha --exit test/integration.spec.js",
