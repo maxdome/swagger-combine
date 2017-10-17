@@ -489,7 +489,8 @@ describe('[Unit] SwaggerCombine.js', () => {
       it('dereference schema security adds security in paths', () => {
         instance.dereferenceSchemaSecurity();
         expect(instance.schemas[0].paths['/test/path/first'].get.security).to.deep.include({ test_schema_auth: [] });
-        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.deep.include({ test_schema_auth: [] });
+        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.deep.include({ test_auth: [] });
+        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.not.deep.include({ test_schema_auth: [] });
         expect(instance.schemas[0].paths['/test/path/second'].get.security).to.deep.include({ test_schema_auth: [] });
         expect(instance.schemas[0].paths['/test/path/second'].post.security).to.deep.include({ test_schema_auth: [] });
       });

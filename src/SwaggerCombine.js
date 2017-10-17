@@ -255,10 +255,10 @@ class SwaggerCombine {
             /(get|put|post|delete|options|head|patch)$/i.test(this.key) &&
             this.parent &&
             this.parent.parent &&
-            this.parent.parent.key === 'paths'
+            this.parent.parent.key === 'paths' &&
+            !this.node.security
           ) {
-            const newSecurity = (this.node.security || []).concat(schema.security);
-            this.update(Object.assign({}, this.node, { security: newSecurity }));
+            this.update(Object.assign({}, this.node, { security: schema.security }));
           }
         });
 
