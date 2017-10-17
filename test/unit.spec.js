@@ -169,7 +169,7 @@ describe('[Unit] SwaggerCombine.js', () => {
                 headers: {
                   authorization: sinon.match.string,
                 },
-              }),
+              })
             );
           });
       });
@@ -203,7 +203,7 @@ describe('[Unit] SwaggerCombine.js', () => {
                 headers: {
                   authorization: token,
                 },
-              }),
+              })
             );
           });
       });
