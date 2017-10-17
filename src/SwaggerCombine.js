@@ -321,6 +321,8 @@ class SwaggerCombine {
   }
 
   combineSchemas() {
+    const operationIds = [];
+
     this.schemas.forEach(schema => {
       const conflictingPaths = _.intersection(_.keys(this.combinedSchema.paths), _.keys(_.get(schema, 'paths')));
       const securityDefinitions = _.get(schema, 'securityDefinitions');
@@ -329,6 +331,21 @@ class SwaggerCombine {
         _.keys(securityDefinitions)
       ).filter(key => !_.isEqual(securityDefinitions[key], this.combinedSchema.securityDefinitions[key]));
 
+      const newOperationIds = traverse(schema).reduce(function (acc, x) {
+        if (
+          'operationId' === this.key &&
+          this.parent &&
+          /(get|put|post|delete|options|head|patch)$/i.test(this.parent.key) &&
+          this.parent.parent &&
+          this.parent.parent.parent &&
+          this.parent.parent.parent.key === 'paths'
+        ) {
+          acc.push(x);
+        }
+        return acc;
+      }, []);
+      const conflictingOperationIds = _.intersection(operationIds, newOperationIds);
+
       if (!_.isEmpty(conflictingPaths)) {
         throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')}`);
       }
@@ -336,6 +353,12 @@ class SwaggerCombine {
       if (!_.isEmpty(conflictingSecurityDefs)) {
         throw new Error(`Name conflict in security definitions: ${conflictingSecurityDefs.join(', ')}`);
       }
+
+      if (!_.isEmpty(conflictingOperationIds)) {
+        throw new Error(`OperationID conflict: ${conflictingOperationIds.join(', ')}`);
+      }
+
+      operationIds.push.apply(operationIds, newOperationIds);
 
       _.defaultsDeep(this.combinedSchema, _.pick(schema, ['paths', 'securityDefinitions']));
     });
