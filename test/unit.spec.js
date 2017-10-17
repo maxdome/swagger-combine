@@ -17,6 +17,11 @@ describe('[Unit] SwaggerCombine.js', () => {
       instance.config = {};
       instance.schemas = [
         {
+          security: [
+            {
+              test_schema_auth: [],
+            },
+          ],
           paths: {
             '/test/path/first': {
               get: {
@@ -80,6 +85,9 @@ describe('[Unit] SwaggerCombine.js', () => {
             test_auth: {
               type: 'apiKey',
             },
+            test_schema_auth: {
+              type: 'apiKey',
+            },
           },
         },
       ];
@@ -92,6 +100,7 @@ describe('[Unit] SwaggerCombine.js', () => {
         sandbox.spy(instance, 'renamePaths');
         sandbox.spy(instance, 'renameTags');
         sandbox.spy(instance, 'renameSecurityDefinitions');
+        sandbox.spy(instance, 'dereferenceSchemaSecurity');
         sandbox.spy(instance, 'addSecurityToPaths');
         sandbox.spy(instance, 'combineSchemas');
         sandbox.spy(instance, 'removeEmptyFields');
@@ -108,6 +117,7 @@ describe('[Unit] SwaggerCombine.js', () => {
           expect(instance.renamePaths).to.have.been.calledOnce;
           expect(instance.renameTags).to.have.been.calledOnce;
           expect(instance.renameSecurityDefinitions).to.have.been.calledOnce;
+          expect(instance.dereferenceSchemaSecurity).to.have.been.calledOnce;
           expect(instance.addSecurityToPaths).to.have.been.calledOnce;
           expect(instance.combineSchemas).to.have.been.calledOnce;
           expect(instance.removeEmptyFields).to.have.been.calledOnce;
@@ -456,13 +466,33 @@ describe('[Unit] SwaggerCombine.js', () => {
       it('renames security definitions', () => {
         instance.renameSecurityDefinitions();
         expect(instance.schemas[0].securityDefinitions).to.not.have.keys('test_auth');
-        expect(instance.schemas[0].securityDefinitions).to.have.keys('renamed_auth');
+        expect(instance.schemas[0].securityDefinitions).to.have.keys('renamed_auth', 'test_schema_auth');
       });
 
       it('renames security in pahts', () => {
         instance.renameSecurityDefinitions();
         expect(instance.schemas[0].paths['/test/path/first'].post.security).to.not.deep.include({ test_auth: [] });
         expect(instance.schemas[0].paths['/test/path/first'].post.security).to.deep.include({ renamed_auth: [] });
+      });
+    });
+
+    describe('dereferenceSchemaSecurity()', () => {
+      beforeEach(() => {
+        instance.apis = [{}];
+      });
+
+      it('dereference schema security', () => {
+        instance.dereferenceSchemaSecurity();
+        expect(instance.schemas[0]).to.not.have.keys('security');
+      });
+
+      it('dereference schema security adds security in paths', () => {
+        instance.dereferenceSchemaSecurity();
+        expect(instance.schemas[0].paths['/test/path/first'].get.security).to.deep.include({ test_schema_auth: [] });
+        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.deep.include({ test_auth: [] });
+        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.not.deep.include({ test_schema_auth: [] });
+        expect(instance.schemas[0].paths['/test/path/second'].get.security).to.deep.include({ test_schema_auth: [] });
+        expect(instance.schemas[0].paths['/test/path/second'].post.security).to.deep.include({ test_schema_auth: [] });
       });
     });
 
@@ -550,8 +580,8 @@ describe('[Unit] SwaggerCombine.js', () => {
         });
 
         instance.combineSchemas();
-        expect(Object.keys(instance.combinedSchema.securityDefinitions)).to.have.length(2);
-        expect(instance.combinedSchema.securityDefinitions).to.have.all.keys(['test_auth', 'schema_two_auth']);
+        expect(Object.keys(instance.combinedSchema.securityDefinitions)).to.have.length(3);
+        expect(instance.combinedSchema.securityDefinitions).to.have.all.keys(['test_auth', 'test_schema_auth', 'schema_two_auth']);
       });
 
       it('throws an error if path name already exists', () => {
@@ -568,7 +598,19 @@ describe('[Unit] SwaggerCombine.js', () => {
         expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in paths: \/test\/path\/first/);
       });
 
-      it('throws an error if security defintion name already exists', () => {
+      it('throws an error if security defintion name with a different configuration already exists', () => {
+        instance.schemas.push({
+          securityDefinitions: {
+            test_auth: {
+              type: 'apiKey_2',
+            },
+          },
+        });
+
+        expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in security definitions: test_auth/);
+      });
+
+      it('accepts identical security defintions with the same name', () => {
         instance.schemas.push({
           securityDefinitions: {
             test_auth: {
@@ -577,7 +619,7 @@ describe('[Unit] SwaggerCombine.js', () => {
           },
         });
 
-        expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in security definitions: test_auth/);
+        expect(instance.combineSchemas.bind(instance)).to.not.throw(/Name conflict in security definitions: test_auth/);
       });
     });
 
