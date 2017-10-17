@@ -21,6 +21,7 @@ describe('[Unit] SwaggerCombine.js', () => {
             '/test/path/first': {
               get: {
                 summary: 'GET /test/path/first',
+                operationId: 'getFirst',
                 parameters: [
                   {
                     name: 'testParam',
@@ -578,6 +579,36 @@ describe('[Unit] SwaggerCombine.js', () => {
         });
 
         expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in security definitions: test_auth/);
+      });
+
+      it('accepts different operationIds', () => {
+        instance.schemas.push({
+          paths: {
+            '/test/path/third': {
+              get: {
+                summary: 'GET /test/path/third',
+                operationId: 'getThird',
+              }
+            }
+          }
+        });
+
+        expect(instance.combineSchemas.bind(instance)).to.not.throw(/OperationID conflict: getThird/);
+      });
+
+      it('throws an error if an operationId is not unique', () => {
+        instance.schemas.push({
+          paths: {
+            '/test/path/third': {
+              get: {
+                summary: 'GET /test/path/third',
+                operationId: 'getFirst',
+              }
+            }
+          }
+        });
+
+        expect(instance.combineSchemas.bind(instance)).to.throw(/OperationID conflict: getFirst/);
       });
     });
 
