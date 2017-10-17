@@ -60,6 +60,7 @@ class SwaggerCombine {
                   return;
                 }
 
+                err.api = api.url;
                 throw err;
               });
           })
