@@ -23,6 +23,7 @@ class SwaggerCombine {
       .then(() => this.renameTags())
       .then(() => this.addTags())
       .then(() => this.renameSecurityDefinitions())
+      .then(() => this.dereferenceSchemaSecurity())
       .then(() => this.addSecurityToPaths())
       .then(() => this.addBasePath())
       .then(() => this.combineSchemas())
@@ -246,6 +247,30 @@ class SwaggerCombine {
     return this;
   }
 
+  dereferenceSchemaSecurity() {
+    this.schemas = this.schemas.map((schema, idx) => {
+      if (schema && schema.security) {
+        traverse(schema).forEach(function traverseSchema() {
+          if (
+            /(get|put|post|delete|options|head|patch)$/i.test(this.key) &&
+            this.parent &&
+            this.parent.parent &&
+            this.parent.parent.key === 'paths'
+          ) {
+            const newSecurity = (this.node.security || []).concat(schema.security);
+            this.update(Object.assign({}, this.node, { security: newSecurity }));
+          }
+        });
+
+        _.unset(schema, 'security');
+      }
+
+      return schema;
+    });
+
+    return this;
+  }
+
   addSecurityToPaths() {
     this.schemas = this.schemas.map((schema, idx) => {
       if (
@@ -298,10 +323,11 @@ class SwaggerCombine {
   combineSchemas() {
     this.schemas.forEach(schema => {
       const conflictingPaths = _.intersection(_.keys(this.combinedSchema.paths), _.keys(_.get(schema, 'paths')));
+      const securityDefinitions = _.get(schema, 'securityDefinitions');
       const conflictingSecurityDefs = _.intersection(
         _.keys(this.combinedSchema.securityDefinitions),
-        _.keys(_.get(schema, 'securityDefinitions'))
-      );
+        _.keys(securityDefinitions)
+      ).filter(key => !_.isEqual(securityDefinitions[key], this.combinedSchema.securityDefinitions[key]));
 
       if (!_.isEmpty(conflictingPaths)) {
         throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')}`);
