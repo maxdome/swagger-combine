@@ -346,6 +346,21 @@ class SwaggerCombine {
       }, []);
       const conflictingOperationIds = _.intersection(operationIds, newOperationIds);
 
+      const newOperationIds = traverse(schema).reduce(function (acc, x) {
+        if (
+          'operationId' === this.key &&
+          this.parent &&
+          /(get|put|post|delete|options|head|patch)$/i.test(this.parent.key) &&
+          this.parent.parent &&
+          this.parent.parent.parent &&
+          this.parent.parent.parent.key === 'paths'
+        ) {
+          acc.push(x);
+        }
+        return acc;
+      }, []);
+      const conflictingOperationIds = _.intersection(operationIds, newOperationIds);
+
       if (!_.isEmpty(conflictingPaths)) {
         throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')}`);
       }
