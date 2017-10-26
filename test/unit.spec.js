@@ -358,7 +358,7 @@ describe('[Unit] SwaggerCombine.js', () => {
     });
 
     describe('renamePaths()', () => {
-      it('renames path', () => {
+      it('renames path - simple version', () => {
         instance.apis = [
           {
             paths: {
@@ -371,7 +371,127 @@ describe('[Unit] SwaggerCombine.js', () => {
 
         instance.renamePaths();
         expect(instance.schemas[0].paths).to.not.have.keys('/test/path/first');
-        expect(instance.schemas[0].paths).to.have.any.keys('/test/path/renamed');
+        expect(instance.schemas[0].paths).to.have.all.keys('/test/path/renamed', '/test/path/second');
+      });
+
+      it('renames path by rename', () => {
+        instance.apis = [
+          {
+            paths: {
+              rename: [
+                {
+                  type: 'rename',
+                  from: '/test/path/first',
+                  to: '/test/path/renamed'
+                },
+              ],
+            },
+          },
+        ];
+
+        instance.renamePaths();
+        expect(instance.schemas[0].paths).to.not.have.keys('/test/path/first');
+        expect(instance.schemas[0].paths).to.have.all.keys('/test/path/renamed', '/test/path/second');
+      });
+
+      it('renames path by regex (string)', () => {
+        instance.apis = [
+          {
+            paths: {
+              rename: [
+                {
+                  type: 'regex',
+                  from: '^\/test\/path\/(.*)',
+                  to: '/test/$1'
+                },
+              ],
+            },
+          },
+        ];
+
+        instance.renamePaths();
+        expect(instance.schemas[0].paths).to.not.have.any.keys('/test/path/first', '/test/path/second');
+        expect(instance.schemas[0].paths).to.have.all.keys('/test/first', '/test/second');
+      });
+
+      it('renames path by regex', () => {
+        const test = (key) => {
+          instance.apis = [
+            {
+              paths: {
+                rename: [
+                  {
+                    type: key,
+                    from: /^\/test\/path\/(.*)/,
+                    to: '/test/$1'
+                  },
+                ],
+              },
+            },
+          ];
+
+          instance.renamePaths();
+          expect(instance.schemas[0].paths).to.not.have.keys('/test/path/first');
+          expect(instance.schemas[0].paths).to.not.have.keys('/test/path/second');
+          expect(instance.schemas[0].paths).to.have.all.keys('/test/first', '/test/second');
+        };
+
+        test('regex');
+        test('regexp');
+      });
+
+      it('renames path by function', () => {
+        const test = (key, param) => {
+          instance.apis = [
+            {
+              paths: {
+                rename: [
+                  {
+                    type: key,
+                    [param]: (path) => path === '/test/path/first' ? '/test/path/renamed' : path
+                  },
+                ],
+              },
+            },
+          ];
+
+          instance.renamePaths();
+          expect(instance.schemas[0].paths).to.not.have.keys('/test/path/first');
+          expect(instance.schemas[0].paths).to.have.all.keys('/test/path/renamed', '/test/path/second');
+        };
+
+        test('fnc', 'to');
+        test('function', 'to');
+
+        test('fnc', 'from');
+        test('function', 'from');
+      });
+
+      it('renames path with correct order', () => {
+        instance.apis = [
+          {
+            paths: {
+              rename: [
+                // /test/path/first /test/path/second
+                { type: 'rename', from: '/test/path/first', to: '/test/path/renamed' },
+                // /test/path/renamed /test/path/second
+                { type: 'regex', from: '^\/test\/path\/(.*)', to: '/test/$1' },
+                // /test/renamed /test/second
+                { type: 'function', to: (path) => path === '/test/renamed' ? '/test/function' : path },
+                // /test/function /test/second
+                { type: 'regex', from: '^\/(.*)\/(.*)', to: '/$1/regex/$2' },
+                // /test/regex/function /test/regex/second
+                { type: 'rename', from: '/test/regex/second', to: '/test/regex/2' },
+                // /test/regex/function /test/regex/2
+              ],
+            },
+          },
+        ];
+
+        instance.renamePaths();
+        expect(instance.schemas[0].paths).to.not.have.keys('/test/path/first', '/test/path/second');
+        expect(instance.schemas[0].paths).to.have.all.keys('/test/regex/function', '/test/regex/2');
+
       });
     });
 

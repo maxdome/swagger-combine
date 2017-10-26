@@ -10,6 +10,7 @@ const addTagsConfig = require('../examples/add-tags');
 const basicConfig = require('../examples/basic');
 const filterConfig = require('../examples/filter');
 const renameConfig = require('../examples/rename');
+const extendedRenameConfig = require('../examples/extendedRename');
 const securityConfig = require('../examples/security');
 const { app, app2 } = require('../examples/middleware');
 
@@ -97,6 +98,16 @@ describe('[Integration] SwaggerCombine.js', () => {
     swaggerCombine(renameConfig).then(schema => {
       expect(schema.paths['/pet/{petId}']).to.not.be.ok;
       expect(schema.paths['/pet/alive/{petId}']).to.be.ok;
+    }));
+
+  it('renames paths (extended)', () =>
+    swaggerCombine(extendedRenameConfig).then(schema => {
+      expect(schema.paths).to.not.have.any.keys(
+        '/pet', '/pet/findByStatus', '/pet/findByTags', '/pet/{petId}', '/pet/{petId}/uploadImage'
+      );
+      expect(schema.paths).to.contain.keys(
+        '/animal', '/animal/findByStatus', '/animal/findByTags', '/animal/alive/{animalId}', '/animal/{animalId}/uploadImage'
+      );
     }));
 
   it('renames tags', () =>
