@@ -8,8 +8,8 @@
     "test:integration": "mocha --exit test/integration.spec.js",
     "test:unit": "mocha --exit test/unit.spec.js",
     "fmt": "maxdome-prettier '{src,test}/**/*.js'",
-    "coverage": "nyc npm test",
-    "prepush": "npm test"
+    "coverage": "nyc npm run test:unit",
+    "precommit": "npm test"
   },
   "keywords": [
     "swagger",

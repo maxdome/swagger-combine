@@ -3,3 +3,8 @@ node_js:
   - "node"
   - "8"
   - "7"
+
+after_script:
+  - npm i -g coveralls
+  - npm run coverage
+  - npx nyc report --reporter=text-lcov | coveralls
