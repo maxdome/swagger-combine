@@ -5,7 +5,7 @@ chai.use(require('sinon-chai'));
 
 const expect = chai.expect;
 
-const swaggerCombine = require('../src');
+const { SwaggerCombine } = require('../../src');
 
 const sandbox = sinon.sandbox.create();
 let instance;
@@ -13,7 +13,7 @@ let instance;
 describe('[Unit] SwaggerCombine.js', () => {
   describe('Instance', () => {
     beforeEach(() => {
-      instance = new swaggerCombine.SwaggerCombine();
+      instance = new SwaggerCombine();
       instance.config = {};
       instance.schemas = [
         {
@@ -491,7 +491,9 @@ describe('[Unit] SwaggerCombine.js', () => {
         instance.dereferenceSchemaSecurity();
         expect(instance.schemas[0].paths['/test/path/first'].get.security).to.deep.include({ test_schema_auth: [] });
         expect(instance.schemas[0].paths['/test/path/first'].post.security).to.deep.include({ test_auth: [] });
-        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.not.deep.include({ test_schema_auth: [] });
+        expect(instance.schemas[0].paths['/test/path/first'].post.security).to.not.deep.include({
+          test_schema_auth: [],
+        });
         expect(instance.schemas[0].paths['/test/path/second'].get.security).to.deep.include({ test_schema_auth: [] });
         expect(instance.schemas[0].paths['/test/path/second'].post.security).to.deep.include({ test_schema_auth: [] });
       });
@@ -582,7 +584,11 @@ describe('[Unit] SwaggerCombine.js', () => {
 
         instance.combineSchemas();
         expect(Object.keys(instance.combinedSchema.securityDefinitions)).to.have.length(3);
-        expect(instance.combinedSchema.securityDefinitions).to.have.all.keys(['test_auth', 'test_schema_auth', 'schema_two_auth']);
+        expect(instance.combinedSchema.securityDefinitions).to.have.all.keys([
+          'test_auth',
+          'test_schema_auth',
+          'schema_two_auth',
+        ]);
       });
 
       it('throws an error if path name already exists', () => {
@@ -630,9 +636,9 @@ describe('[Unit] SwaggerCombine.js', () => {
               get: {
                 summary: 'GET /test/path/third',
                 operationId: 'getThird',
-              }
-            }
-          }
+              },
+            },
+          },
         });
 
         expect(instance.combineSchemas.bind(instance)).to.not.throw(/OperationID conflict: getThird/);
@@ -645,9 +651,9 @@ describe('[Unit] SwaggerCombine.js', () => {
               get: {
                 summary: 'GET /test/path/third',
                 operationId: 'getFirst',
-              }
-            }
-          }
+              },
+            },
+          },
         });
 
         expect(instance.combineSchemas.bind(instance)).to.throw(/OperationID conflict: getFirst/);
@@ -685,31 +691,6 @@ describe('[Unit] SwaggerCombine.js', () => {
         instance.opts = { format: 'yaml' };
         expect(instance.toString()).to.equal('test: test\ntestTwo:\n  - test\n');
       });
-    });
-  });
-});
-
-describe('[Unit] middleware.js', () => {
-  describe('middleware()', () => {
-    it('is exposed', () => {
-      expect(swaggerCombine.middleware).to.be.a('function');
-    });
-
-    it('returns a middleware function', () => {
-      expect(swaggerCombine.middleware({})).to.be.a('function');
-    });
-  });
-
-  describe('middlewareAsync()', () => {
-    it('is exposed', () => {
-      expect(swaggerCombine.middlewareAsync).to.be.a('function');
-    });
-
-    it('returns a promise yielding a middleware', async () => {
-      const mw = swaggerCombine.middlewareAsync({});
-
-      expect(mw).to.be.a('promise');
-      return expect(await mw).to.be.a('function');
     });
   });
 });

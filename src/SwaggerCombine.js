@@ -332,7 +332,7 @@ class SwaggerCombine {
         _.keys(securityDefinitions)
       ).filter(key => !_.isEqual(securityDefinitions[key], this.combinedSchema.securityDefinitions[key]));
 
-      const newOperationIds = traverse(schema).reduce(function (acc, x) {
+      const newOperationIds = traverse(schema).reduce(function(acc, x) {
         if (
           'operationId' === this.key &&
           this.parent &&

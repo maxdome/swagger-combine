@@ -4,9 +4,9 @@
   "description": "Combines multiple Swagger schemas into one dereferenced schema",
   "main": "src/index.js",
   "scripts": {
-    "test": "mocha --exit test/*.spec.js",
+    "test": "mocha --exit --recursive test",
     "test:integration": "mocha --exit test/integration.spec.js",
-    "test:unit": "mocha --exit test/unit.spec.js",
+    "test:unit": "mocha --exit --recursive test/unit",
     "fmt": "maxdome-prettier '{src,test}/**/*.js'",
     "coverage": "nyc npm run test:unit",
     "precommit": "npm test"
@@ -16,7 +16,8 @@
     "combine",
     "merge",
     "api",
-    "documentation"
+    "documentation",
+    "open api"
   ],
   "author": {
     "name": "maxdome",
