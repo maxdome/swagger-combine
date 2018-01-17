@@ -1,28 +1,30 @@
 const SwaggerCombine = require('./SwaggerCombine');
 
-exports.middleware = (config, opts = {}) => {
-  return function(req, res, next) {
-    new SwaggerCombine(config, opts)
-      .combine()
-      .then(sc => {
-        if (opts && (opts.format === 'yaml' || opts.format === 'yml')) {
-          return res.type('yaml').send(sc.toString());
-        }
+class Middleware {
+  static sendResponse(opts, sc, req, res, next) {
+    if (opts && (opts.format === 'yaml' || opts.format === 'yml')) {
+      return res.type('yaml').send(sc.toString());
+    }
 
-        res.json(sc.combinedSchema);
-      })
-      .catch(err => next(err));
-  };
-};
+    res.json(sc.combinedSchema);
+  }
 
-exports.middlewareAsync = (config, opts = {}) => {
-  return new SwaggerCombine(config, opts).combine().then(sc => {
+  static middleware(config, opts = {}) {
     return function(req, res, next) {
-      if (opts && (opts.format === 'yaml' || opts.format === 'yml')) {
-        return res.type('yaml').send(sc.toString());
-      }
-
-      res.json(sc.combinedSchema);
+      return new SwaggerCombine(config, opts)
+        .combine()
+        .then(sc => Middleware.sendResponse(opts, sc, req, res, next))
+        .catch(err => next(err));
     };
-  });
-};
+  }
+
+  static middlewareAsync(config, opts = {}) {
+    return new SwaggerCombine(config, opts).combine().then(sc => {
+      return function(req, res, next) {
+        Middleware.sendResponse(opts, sc, req, res, next);
+      };
+    });
+  }
+}
+
+module.exports = Middleware;
