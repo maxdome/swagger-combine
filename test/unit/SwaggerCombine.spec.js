@@ -94,6 +94,17 @@ describe('[Unit] SwaggerCombine.js', () => {
       ];
     });
 
+    it('checks to see if opts is still has default property when not nothing is passed in', () => {
+      expect(instance.opts.hasOwnProperty('continueOnConflictingPaths')).to.be.true;
+    });
+
+    it('checks to see if opts.continueOnConflictingPaths equals true', () => {
+      instance.opts = {
+        continueOnConflictingPaths: true
+      }
+      expect(instance.opts.continueOnConflictingPaths).to.be.true;
+    });
+
     describe('combine()', () => {
       beforeEach(() => {
         sandbox.spy(instance, 'load');
@@ -589,17 +600,6 @@ describe('[Unit] SwaggerCombine.js', () => {
           'test_schema_auth',
           'schema_two_auth',
         ]);
-      });
-
-      it('checks to see if opts is still has default property when not nothing is passed in', () => {
-        expect(instance.opts.hasOwnProperty('continueOnConflictingPaths')).to.be.true;
-      });
-
-      it('checks to see if opts.continueOnConflictingPaths equals true', () => {
-        instance.opts = {
-          continueOnConflictingPaths: true
-        }
-        expect(instance.opts.continueOnConflictingPaths).to.be.true;
       });
 
       it('throws an error if path name already exists and opts propery continueOnConflictingPaths is false', () => {
