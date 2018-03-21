@@ -9,7 +9,9 @@ const operationTypes = ['get', 'put', 'post', 'delete', 'options', 'head', 'patc
 class SwaggerCombine {
   constructor(config, opts) {
     this.config = _.cloneDeep(config);
-    this.opts = opts || {};
+    this.opts = opts || { 
+      continueOnConflictingPaths: false //set as default
+    };
     this.apis = [];
     this.schemas = [];
     this.combinedSchema = {};
@@ -348,7 +350,14 @@ class SwaggerCombine {
       const conflictingOperationIds = _.intersection(operationIds, newOperationIds);
 
       if (!_.isEmpty(conflictingPaths)) {
-        throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')}`);
+        if(this.opts.continueOnConflictingPaths) {
+          const conflictingPathOps = _.intersection(_.keys(this.combinedSchema.paths[conflictingPaths]), _.keys(schema.paths[conflictingPaths]));
+          if (!_.isEmpty(conflictingPathOps)) {
+            throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')} at operation: ${conflictingPathOps.join(', ')}`);
+          }
+        } else {
+          throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')}`);
+        }
       }
 
       if (!_.isEmpty(conflictingSecurityDefs)) {
