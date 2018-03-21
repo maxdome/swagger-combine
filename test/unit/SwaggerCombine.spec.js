@@ -591,6 +591,17 @@ describe('[Unit] SwaggerCombine.js', () => {
         ]);
       });
 
+      it('checks to see if opts is still has default property when not nothing is passed in', () => {
+        expect(instance.opts.hasOwnProperty('continueOnConflictingPaths')).to.be.true;
+      });
+
+      it('checks to see if opts.continueOnConflictingPaths equals true', () => {
+        instance.opts = {
+          continueOnConflictingPaths: true
+        }
+        expect(instance.opts.continueOnConflictingPaths).to.be.true;
+      });
+
       it('throws an error if path name already exists and opts propery continueOnConflictingPaths is false', () => {
         instance.opts = {continueOnConflictingPaths: false};
         instance.schemas.push({

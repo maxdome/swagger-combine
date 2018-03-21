@@ -9,9 +9,7 @@ const operationTypes = ['get', 'put', 'post', 'delete', 'options', 'head', 'patc
 class SwaggerCombine {
   constructor(config, opts) {
     this.config = _.cloneDeep(config);
-    this.opts = opts || { 
-      continueOnConflictingPaths: false //set as default
-    };
+    this.opts = !_.isEmpty(opts) ? opts.hasOwnProperty('continueOnConflictingPaths') ? opts : opts: Object.assign({}, {continueOnConflictingPaths: false});  //set as default
     this.apis = [];
     this.schemas = [];
     this.combinedSchema = {};
