@@ -614,10 +614,24 @@ describe('[Unit] SwaggerCombine.js', () => {
                 summary: 'GET /test/path/first duplicate',
               },
             },
+            '/test/path/second': {
+              get: {
+                summary: 'GET /test/path/first duplicate',
+              }
+            },
           },
         });
 
-        expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in paths: \/test\/path\/first at operation: get/);
+        expect(instance.combineSchemas.bind(instance)).to.satisfy((msg) => {
+          if(
+            expect(msg).to.throw(/Name conflict in paths: \/test\/path\/first at operation: get/) ||
+            expect(msg).to.throw(/Name conflict in paths: \/test\/path\/second at operation: get/)
+          ) {
+            return true;
+          } else {
+            return false;
+          };
+        })
       });
 
       it('accepts duplicate path names if opts propery continueOnConflictingPaths is true and there are not duplicate operations', () => {
@@ -628,7 +642,7 @@ describe('[Unit] SwaggerCombine.js', () => {
               patch: {
                 summary: 'PATCH /test/path/first',
               },
-            },
+            },        
           },
         });
 

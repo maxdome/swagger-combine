@@ -349,9 +349,11 @@ class SwaggerCombine {
 
       if (!_.isEmpty(conflictingPaths)) {
         if(this.opts.continueOnConflictingPaths) {
-          const conflictingPathOps = _.intersection(_.keys(this.combinedSchema.paths[conflictingPaths]), _.keys(schema.paths[conflictingPaths]));
-          if (!_.isEmpty(conflictingPathOps)) {
-            throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')} at operation: ${conflictingPathOps.join(', ')}`);
+          for(let cPath of conflictingPaths) {
+            const conflictingPathOps = _.intersection(_.keys(this.combinedSchema.paths[cPath]), _.keys(schema.paths[cPath]));
+            if (!_.isEmpty(conflictingPathOps)) {
+                throw new Error(`Name conflict in paths: ${cPath} at operation: ${conflictingPathOps.join(', ')}`);
+            } 
           }
         } else {
           throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')}`);
