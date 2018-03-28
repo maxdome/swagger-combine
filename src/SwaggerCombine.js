@@ -348,7 +348,16 @@ class SwaggerCombine {
       const conflictingOperationIds = _.intersection(operationIds, newOperationIds);
 
       if (!_.isEmpty(conflictingPaths)) {
-        throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')}`);
+        if(this.opts.continueOnConflictingPaths) {
+          for(let cPath of conflictingPaths) {
+            const conflictingPathOps = _.intersection(_.keys(this.combinedSchema.paths[cPath]), _.keys(schema.paths[cPath]));
+            if (!_.isEmpty(conflictingPathOps)) {
+                throw new Error(`Name conflict in paths: ${cPath} at operation: ${conflictingPathOps.join(', ')}`);
+            } 
+          }
+        } else {
+          throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')}`);
+        }
       }
 
       if (!_.isEmpty(conflictingSecurityDefs)) {

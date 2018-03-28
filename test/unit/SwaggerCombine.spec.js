@@ -605,6 +605,50 @@ describe('[Unit] SwaggerCombine.js', () => {
         expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in paths: \/test\/path\/first/);
       });
 
+      it('throws an error if path name already exists and opts propery continueOnConflictingPaths is true and there are duplicate operations', () => {
+        instance.opts = { continueOnConflictingPaths: true };
+        instance.schemas.push({
+          paths: {
+            '/test/path/first': {
+              get: {
+                summary: 'GET /test/path/first duplicate',
+              },
+            },
+            '/test/path/second': {
+              get: {
+                summary: 'GET /test/path/first duplicate',
+              }
+            },
+          },
+        });
+
+        expect(instance.combineSchemas.bind(instance)).to.satisfy((msg) => {
+          if(
+            expect(msg).to.throw(/Name conflict in paths: \/test\/path\/first at operation: get/) ||
+            expect(msg).to.throw(/Name conflict in paths: \/test\/path\/second at operation: get/)
+          ) {
+            return true;
+          } else {
+            return false;
+          };
+        })
+      });
+
+      it('accepts duplicate path names if opts propery continueOnConflictingPaths is true and there are not duplicate operations', () => {
+        instance.opts = { continueOnConflictingPaths: true };
+        instance.schemas.push({
+          paths: {
+            '/test/path/first': {
+              patch: {
+                summary: 'PATCH /test/path/first',
+              },
+            },        
+          },
+        });
+
+        expect(instance.combineSchemas.bind(instance)).to.not.throw(/Name conflict in paths: \/test\/path\/first at operation: patch/);
+      });
+
       it('throws an error if security defintion name with a different configuration already exists', () => {
         instance.schemas.push({
           securityDefinitions: {
