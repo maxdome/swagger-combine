@@ -103,10 +103,18 @@ describe('[Integration] SwaggerCombine.js', () => {
   it('renames paths (extended)', () =>
     swaggerCombine(extendedRenameConfig).then(schema => {
       expect(schema.paths).to.not.have.any.keys(
-        '/pet', '/pet/findByStatus', '/pet/findByTags', '/pet/{petId}', '/pet/{petId}/uploadImage'
+        '/pet',
+        '/pet/findByStatus',
+        '/pet/findByTags',
+        '/pet/{petId}',
+        '/pet/{petId}/uploadImage'
       );
       expect(schema.paths).to.contain.keys(
-        '/animal', '/animal/findByStatus', '/animal/findByTags', '/animal/alive/{animalId}', '/animal/{animalId}/uploadImage'
+        '/animal',
+        '/animal/findByStatus',
+        '/animal/findByTags',
+        '/animal/alive/{animalId}',
+        '/animal/{animalId}/uploadImage'
       );
     }));
 

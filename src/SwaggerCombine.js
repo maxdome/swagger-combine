@@ -157,28 +157,25 @@ class SwaggerCombine {
             renamings.push({
               type: 'rename',
               from: pathToRename,
-              to: renamePath
+              to: renamePath,
             });
           });
         } else {
           renamings = this.apis[idx].paths.rename;
         }
 
-        _.forEach(renamings, (value) => {
+        _.forEach(renamings, value => {
           schema.paths = _.mapKeys(schema.paths, (curPathValue, curPath) => {
             switch (value.type) {
               case 'rename':
                 return this.renamePathByReplace(curPath, value.from, value.to);
-                break;
               case 'regex':
               case 'regexp':
                 return this.renamePathByRegexp(curPath, value.from, value.to);
-                break;
               case 'fn':
               case 'fnc':
               case 'function':
                 return (value.to || value.from)(curPath);
-                break;
               default:
                 return curPath;
             }
@@ -393,12 +390,15 @@ class SwaggerCombine {
       const conflictingOperationIds = _.intersection(operationIds, newOperationIds);
 
       if (!_.isEmpty(conflictingPaths)) {
-        if(this.opts.continueOnConflictingPaths) {
-          for(let cPath of conflictingPaths) {
-            const conflictingPathOps = _.intersection(_.keys(this.combinedSchema.paths[cPath]), _.keys(schema.paths[cPath]));
+        if (this.opts.continueOnConflictingPaths) {
+          for (let cPath of conflictingPaths) {
+            const conflictingPathOps = _.intersection(
+              _.keys(this.combinedSchema.paths[cPath]),
+              _.keys(schema.paths[cPath])
+            );
             if (!_.isEmpty(conflictingPathOps)) {
-                throw new Error(`Name conflict in paths: ${cPath} at operation: ${conflictingPathOps.join(', ')}`);
-            } 
+              throw new Error(`Name conflict in paths: ${cPath} at operation: ${conflictingPathOps.join(', ')}`);
+            }
           }
         } else {
           throw new Error(`Name conflict in paths: ${conflictingPaths.join(', ')}`);

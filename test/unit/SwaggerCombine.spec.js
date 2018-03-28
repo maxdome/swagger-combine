@@ -382,7 +382,7 @@ describe('[Unit] SwaggerCombine.js', () => {
                 {
                   type: 'rename',
                   from: '/test/path/first',
-                  to: '/test/path/renamed'
+                  to: '/test/path/renamed',
                 },
               ],
             },
@@ -401,8 +401,8 @@ describe('[Unit] SwaggerCombine.js', () => {
               rename: [
                 {
                   type: 'regex',
-                  from: '^\/test\/path\/(.*)',
-                  to: '/test/$1'
+                  from: '^/test/path/(.*)',
+                  to: '/test/$1',
                 },
               ],
             },
@@ -415,7 +415,7 @@ describe('[Unit] SwaggerCombine.js', () => {
       });
 
       it('renames path by regex', () => {
-        const test = (key) => {
+        const test = key => {
           instance.apis = [
             {
               paths: {
@@ -423,7 +423,7 @@ describe('[Unit] SwaggerCombine.js', () => {
                   {
                     type: key,
                     from: /^\/test\/path\/(.*)/,
-                    to: '/test/$1'
+                    to: '/test/$1',
                   },
                 ],
               },
@@ -448,7 +448,7 @@ describe('[Unit] SwaggerCombine.js', () => {
                 rename: [
                   {
                     type: key,
-                    [param]: (path) => path === '/test/path/first' ? '/test/path/renamed' : path
+                    [param]: path => (path === '/test/path/first' ? '/test/path/renamed' : path),
                   },
                 ],
               },
@@ -460,11 +460,33 @@ describe('[Unit] SwaggerCombine.js', () => {
           expect(instance.schemas[0].paths).to.have.all.keys('/test/path/renamed', '/test/path/second');
         };
 
+        test('fn', 'to');
+        test('function', 'to');
+
         test('fnc', 'to');
         test('function', 'to');
 
         test('fnc', 'from');
         test('function', 'from');
+      });
+
+      it('does not rename paths if type is invalid', () => {
+        instance.apis = [
+          {
+            paths: {
+              rename: [
+                {
+                  type: 'invalid',
+                  from: '/test/path/first',
+                  to: '/test/path/renamed',
+                },
+              ],
+            },
+          },
+        ];
+
+        instance.renamePaths();
+        expect(instance.schemas[0].paths).to.not.have.keys('/test/path/renamed');
       });
 
       it('renames path with correct order', () => {
@@ -475,11 +497,11 @@ describe('[Unit] SwaggerCombine.js', () => {
                 // /test/path/first /test/path/second
                 { type: 'rename', from: '/test/path/first', to: '/test/path/renamed' },
                 // /test/path/renamed /test/path/second
-                { type: 'regex', from: '^\/test\/path\/(.*)', to: '/test/$1' },
+                { type: 'regex', from: '^/test/path/(.*)', to: '/test/$1' },
                 // /test/renamed /test/second
-                { type: 'function', to: (path) => path === '/test/renamed' ? '/test/function' : path },
+                { type: 'function', to: path => (path === '/test/renamed' ? '/test/function' : path) },
                 // /test/function /test/second
-                { type: 'regex', from: '^\/(.*)\/(.*)', to: '/$1/regex/$2' },
+                { type: 'regex', from: '^/(.*)/(.*)', to: '/$1/regex/$2' },
                 // /test/regex/function /test/regex/second
                 { type: 'rename', from: '/test/regex/second', to: '/test/regex/2' },
                 // /test/regex/function /test/regex/2
@@ -491,7 +513,6 @@ describe('[Unit] SwaggerCombine.js', () => {
         instance.renamePaths();
         expect(instance.schemas[0].paths).to.not.have.keys('/test/path/first', '/test/path/second');
         expect(instance.schemas[0].paths).to.have.all.keys('/test/regex/function', '/test/regex/2');
-
       });
     });
 
@@ -737,21 +758,21 @@ describe('[Unit] SwaggerCombine.js', () => {
             '/test/path/second': {
               get: {
                 summary: 'GET /test/path/first duplicate',
-              }
+              },
             },
           },
         });
 
-        expect(instance.combineSchemas.bind(instance)).to.satisfy((msg) => {
-          if(
+        expect(instance.combineSchemas.bind(instance)).to.satisfy(msg => {
+          if (
             expect(msg).to.throw(/Name conflict in paths: \/test\/path\/first at operation: get/) ||
             expect(msg).to.throw(/Name conflict in paths: \/test\/path\/second at operation: get/)
           ) {
             return true;
           } else {
             return false;
-          };
-        })
+          }
+        });
       });
 
       it('accepts duplicate path names if opts propery continueOnConflictingPaths is true and there are not duplicate operations', () => {
@@ -762,11 +783,13 @@ describe('[Unit] SwaggerCombine.js', () => {
               patch: {
                 summary: 'PATCH /test/path/first',
               },
-            },        
+            },
           },
         });
 
-        expect(instance.combineSchemas.bind(instance)).to.not.throw(/Name conflict in paths: \/test\/path\/first at operation: patch/);
+        expect(instance.combineSchemas.bind(instance)).to.not.throw(
+          /Name conflict in paths: \/test\/path\/first at operation: patch/
+        );
       });
 
       it('throws an error if security defintion name with a different configuration already exists', () => {

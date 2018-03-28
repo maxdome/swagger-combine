@@ -7,8 +7,8 @@
     "test": "mocha --exit --recursive test",
     "test:integration": "mocha --exit test/integration.spec.js",
     "test:unit": "mocha --recursive test/unit",
+    "test:coverage": "nyc npm run test:unit",
     "fmt": "maxdome-prettier '{src,test}/**/*.js'",
-    "coverage": "nyc npm run test:unit",
     "precommit": "npm test"
   },
   "keywords": [
@@ -69,6 +69,10 @@
     "exclude": [
       "examples",
       "test"
+    ],
+    "reporter": [
+      "text",
+      "html"
     ]
   }
 }
