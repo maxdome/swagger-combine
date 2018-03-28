@@ -174,6 +174,7 @@ class SwaggerCombine {
               case 'regexp':
                 return this.renamePathByRegexp(curPath, value.from, value.to);
                 break;
+              case 'fn':
               case 'fnc':
               case 'function':
                 return (value.to || value.from)(curPath);
