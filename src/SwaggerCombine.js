@@ -149,13 +149,38 @@ class SwaggerCombine {
   renamePaths() {
     this.schemas = this.schemas.map((schema, idx) => {
       if (this.apis[idx].paths && this.apis[idx].paths.rename && Object.keys(this.apis[idx].paths.rename).length > 0) {
-        _.forIn(this.apis[idx].paths.rename, (renamePath, pathToRename) => {
-          schema.paths = _.mapKeys(schema.paths, (value, curPath) => {
-            if (pathToRename === curPath) {
-              return renamePath;
-            }
+        let renamings;
 
-            return curPath;
+        if (_.isPlainObject(this.apis[idx].paths.rename)) {
+          renamings = [];
+          _.forIn(this.apis[idx].paths.rename, (renamePath, pathToRename) => {
+            renamings.push({
+              type: 'rename',
+              from: pathToRename,
+              to: renamePath
+            });
+          });
+        } else {
+          renamings = this.apis[idx].paths.rename;
+        }
+
+        _.forEach(renamings, (value) => {
+          schema.paths = _.mapKeys(schema.paths, (curPathValue, curPath) => {
+            switch (value.type) {
+              case 'rename':
+                return this.renamePathByReplace(curPath, value.from, value.to);
+                break;
+              case 'regex':
+              case 'regexp':
+                return this.renamePathByRegexp(curPath, value.from, value.to);
+                break;
+              case 'fnc':
+              case 'function':
+                return (value.to || value.from)(curPath);
+                break;
+              default:
+                return curPath;
+            }
           });
         });
       }
@@ -164,6 +189,25 @@ class SwaggerCombine {
     });
 
     return this;
+  }
+
+  renamePathByReplace(curPath, pathToRename, renamePath) {
+    if (pathToRename === curPath) {
+      return renamePath;
+    }
+
+    return curPath;
+  }
+
+  renamePathByRegexp(curPath, pathToRename, renamePath) {
+    let regex;
+    if (_.isRegExp(pathToRename)) {
+      regex = pathToRename;
+    } else {
+      regex = new RegExp(pathToRename);
+    }
+
+    return curPath.replace(regex, renamePath);
   }
 
   renameTags() {
