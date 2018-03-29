@@ -1,4 +1,4 @@
 #!/usr/bin/env node
 
 process.title = 'swagger-combine';
-require('../src/cli')(process.argv);
+require('../src/cli')(process.argv.slice(2));

@@ -4,10 +4,20 @@ const fs = require('fs');
 const swaggerCombine = require('.');
 
 function CLI(argv) {
-  const args = minimist(argv.slice(2));
+  const args = minimist(argv);
   const config = args._[0];
 
-  swaggerCombine(config)
+  if (args.h) {
+    console.log('Usage: swagger-combine <config> [-o|--output file]')
+    return;
+  }
+
+  if (!config) {
+    console.log('No config file in arguments');
+    return;
+  }
+
+  return swaggerCombine(config)
     .then(schema => {
       const output = args.output || args.o;
       
