@@ -551,6 +551,10 @@ For all possible resolve options have a look at the [documentation of json-schem
 * **continueOnError** - `boolean`
 
     Continue if Swagger configs cannot be resolved or are invalid (default: `false`). *No warning or error message is returned if this option is enabled.*
+    
+* **continueOnConflictingPaths** - `boolean`
+
+    Continue if Swagger schemas have conflicting paths (default: `false`). An error is only thrown if conflicting paths also have conflicting operations (e.g. if two Swagger schemas both have `/pets.get` and `/pets.get` defined).
 
 > See [JSON Schema $Ref Parser Options](https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/options.md) for a list of options for the parser.
 
