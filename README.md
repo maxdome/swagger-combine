@@ -505,44 +505,13 @@ For all possible resolve options have a look at the [documentation of json-schem
 
 **Returns** `promise` with dereferenced and combined schema.
 
-#### config
-
-**`string|object`**
+#### config `string|object`
 
 > URL/path to config schema file or config schema object.
 >
 > **Default:** `docs/swagger.json`
 
-#### options
-
-**`object`** *(optional)*
-
-> See [JSON Schema $Ref Parser Options](https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/options.md) for a complete list of options.
-
-#### callback
-
-**`function(err, combinedSchema)`** *(optional)*
-
-> Callback with error and the dereferenced and combined schema.
-
-
-### swaggerCombine.middleware(config, [options])
-
-**Returns** `function(req, res, next)` for usage as middleware.
-
-#### config
-
-**`string|object`**
-
-> URL/path to config schema file or config schema object.
->
-> **Default:** `docs/swagger.json`
-
-#### options
-
-**`object`** *(optional)*
-
-> Additional options
+#### options `object` *(optional)*
 
 * **format** - `string`
 
@@ -551,21 +520,38 @@ For all possible resolve options have a look at the [documentation of json-schem
 * **continueOnError** - `boolean`
 
     Continue if Swagger configs cannot be resolved or are invalid (default: `false`). *No warning or error message is returned if this option is enabled.*
-    
+
 * **continueOnConflictingPaths** - `boolean`
 
     Continue if Swagger schemas have conflicting paths (default: `false`). An error is only thrown if conflicting paths also have conflicting operations (e.g. if two Swagger schemas both have `/pets.get` and `/pets.get` defined).
 
-> See [JSON Schema $Ref Parser Options](https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/options.md) for a list of options for the parser.
+> See [JSON Schema $Ref Parser Options](https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/options.md) for a complete list of options.
+
+#### callback `function(err, combinedSchema)` *(optional)*
+
+> Callback with error and the dereferenced and combined schema.
+
+
+### swaggerCombine.middleware(config, [options])
+
+**Returns** `function(req, res, next)` for usage as middleware.
+
+#### config `string|object`
+
+*see above*
+
+#### options `object` *(optional)*
+
+*see above*
 
 ### swaggerCombine.middlewareAsync(config, [options])
 
 **Returns** a `promise` yielding a `function(req, res, next)` for usage as middleware.
 
-#### config
+#### config `string|object`
 
 *see above*
 
-#### options
+#### options `object` *(optional)*
 
 *see above*
