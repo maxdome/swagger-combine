@@ -16,6 +16,12 @@ Swagger Combine
 $ npm install --save swagger-combine
 ```
 
+#### Globally for CLI usage
+
+```sh
+$ npm install -g swagger-combine
+```
+
 ## Usage
 
 ```js
@@ -67,6 +73,17 @@ const app = require('express')();
 
 ```
 
+### CLI
+
+```sh
+$ swagger-combine config.json
+```
+
+#### Save to File
+
+```sh
+$ swagger-combine config.json -o combinedSchema.json
+```
 
 ## Configuration
 

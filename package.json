@@ -3,6 +3,9 @@
   "version": "0.14.0",
   "description": "Combines multiple Swagger schemas into one dereferenced schema",
   "main": "src/index.js",
+  "bin": {
+    "swagger-combine": "./bin/swagger-combine"
+  },
   "scripts": {
     "test": "mocha --exit --recursive test",
     "test:integration": "mocha --exit test/integration.spec.js",
@@ -42,6 +45,7 @@
     "call-me-maybe": "^1.0.1",
     "json-schema-ref-parser": "^5.0.0",
     "lodash": "^4.17.4",
+    "minimist": "^1.2.0",
     "swagger-parser": "^4.0.0",
     "traverse": "^0.6.6",
     "url-join": "^4.0.0"
