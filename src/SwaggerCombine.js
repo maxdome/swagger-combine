@@ -22,6 +22,7 @@ class SwaggerCombine {
       .then(() => this.renamePaths())
       .then(() => this.renameTags())
       .then(() => this.addTags())
+      .then(() => this.renameOperationIds())
       .then(() => this.renameSecurityDefinitions())
       .then(() => this.dereferenceSchemaSecurity())
       .then(() => this.addSecurityToPaths())
@@ -164,22 +165,8 @@ class SwaggerCombine {
           renamings = this.apis[idx].paths.rename;
         }
 
-        _.forEach(renamings, value => {
-          schema.paths = _.mapKeys(schema.paths, (curPathValue, curPath) => {
-            switch (value.type) {
-              case 'rename':
-                return this.renamePathByReplace(curPath, value.from, value.to);
-              case 'regex':
-              case 'regexp':
-                return this.renamePathByRegexp(curPath, value.from, value.to);
-              case 'fn':
-              case 'fnc':
-              case 'function':
-                return (value.to || value.from)(curPath);
-              default:
-                return curPath;
-            }
-          });
+        _.forEach(renamings, renaming => {
+          schema.paths = _.mapKeys(schema.paths, (curPathValue, curPath) => this.rename(renaming, curPath));
         });
       }
 
@@ -189,23 +176,74 @@ class SwaggerCombine {
     return this;
   }
 
-  renamePathByReplace(curPath, pathToRename, renamePath) {
-    if (pathToRename === curPath) {
-      return renamePath;
-    }
+  renameOperationIds() {
+    this.schemas = this.schemas.map((schema, idx) => {
+        if (this.apis[idx].operationIds && this.apis[idx].operationIds.rename && Object.keys(this.apis[idx].operationIds.rename).length > 0) {
+            let renamings;
 
-    return curPath;
+            if (_.isPlainObject(this.apis[idx].operationIds.rename)) {
+                renamings = [];
+                _.forIn(this.apis[idx].operationIds.rename, (renameOperationId, operationIdToRename) => {
+                    renamings.push({
+                        type: 'rename',
+                        from: operationIdToRename,
+                        to: renameOperationId,
+                    });
+                });
+            } else {
+                renamings = this.apis[idx].operationIds.rename;
+            }
+
+            _.forEach(renamings, renaming => {
+              const rename = this.rename.bind(this);
+              traverse(schema).forEach(function traverseSchema() {
+                if (this.key === 'operationId') {
+                  const newName = rename(renaming, this.node);
+                  this.update(newName);
+                }
+              });
+          });
+        }
+
+        return schema;
+    });
+
+    return this;
   }
 
-  renamePathByRegexp(curPath, pathToRename, renamePath) {
-    let regex;
-    if (_.isRegExp(pathToRename)) {
-      regex = pathToRename;
-    } else {
-      regex = new RegExp(pathToRename);
+  rename(renaming, node) {
+    switch (renaming.type) {
+      case 'rename':
+        return this.renameByReplace(node, renaming.from, renaming.to);
+      case 'regex':
+      case 'regexp':
+        return this.renameByRegexp(node, renaming.from, renaming.to);
+      case 'fn':
+      case 'fnc':
+      case 'function':
+        return (renaming.to || renaming.from)(node);
+      default:
+        return node;
+    }
+  }
+
+  renameByReplace(currentValue, valueToRename, renameValue) {
+    if (valueToRename === currentValue) {
+      return renameValue;
     }
 
-    return curPath.replace(regex, renamePath);
+    return currentValue;
+  }
+
+  renameByRegexp(currentValue, valueToRename, renameValue) {
+    let regex;
+    if (_.isRegExp(valueToRename)) {
+      regex = valueToRename;
+    } else {
+      regex = new RegExp(valueToRename);
+    }
+
+    return currentValue.replace(regex, renameValue);
   }
 
   renameTags() {

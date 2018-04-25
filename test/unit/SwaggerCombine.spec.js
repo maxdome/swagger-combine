@@ -100,6 +100,7 @@ describe('[Unit] SwaggerCombine.js', () => {
         sandbox.spy(instance, 'filterPaths');
         sandbox.spy(instance, 'renamePaths');
         sandbox.spy(instance, 'renameTags');
+        sandbox.spy(instance, 'renameOperationIds');
         sandbox.spy(instance, 'renameSecurityDefinitions');
         sandbox.spy(instance, 'dereferenceSchemaSecurity');
         sandbox.spy(instance, 'addSecurityToPaths');
@@ -117,6 +118,7 @@ describe('[Unit] SwaggerCombine.js', () => {
           expect(instance.filterPaths).to.have.been.calledOnce;
           expect(instance.renamePaths).to.have.been.calledOnce;
           expect(instance.renameTags).to.have.been.calledOnce;
+          expect(instance.renameOperationIds).to.have.been.calledOnce;
           expect(instance.renameSecurityDefinitions).to.have.been.calledOnce;
           expect(instance.dereferenceSchemaSecurity).to.have.been.calledOnce;
           expect(instance.addSecurityToPaths).to.have.been.calledOnce;
@@ -514,6 +516,85 @@ describe('[Unit] SwaggerCombine.js', () => {
         expect(instance.schemas[0].paths).to.not.have.keys('/test/path/first', '/test/path/second');
         expect(instance.schemas[0].paths).to.have.all.keys('/test/regex/function', '/test/regex/2');
       });
+    });
+
+    describe('renameOperationIds()', () => {
+      it('renames operationId - simple version', () => {
+        instance.apis = [
+          {
+            operationIds: {
+              rename: {
+                'getFirst': 'getFirstRenamed'
+              },
+            },
+          },
+        ];
+
+        instance.renameOperationIds();
+        expect(instance.schemas[0].paths["/test/path/first"].get.operationId).to.equal('getFirstRenamed');
+      });
+
+      it('renames operationId by rename', () => {
+        instance.apis = [
+          {
+            operationIds: {
+              rename: [
+                {
+                  type: 'rename',
+                  from: 'getFirst',
+                  to: 'getFirstRenamed',
+                }
+              ],
+            },
+          },
+        ];
+
+        instance.renameOperationIds();
+        expect(instance.schemas[0].paths["/test/path/first"].get.operationId).to.equal('getFirstRenamed');
+      });
+
+      it('renames operationId by regex (string)', () => {
+        instance.apis = [
+          {
+            operationIds: {
+              rename: [
+                {
+                  type: 'regex',
+                  from: '^get(.*)',
+                  to: 'renamed$1',
+                },
+              ],
+            },
+          },
+        ];
+
+        instance.renameOperationIds();
+        expect(instance.schemas[0].paths["/test/path/first"].get.operationId).to.equal('renamedFirst');
+      });
+
+      it('renames operationId by regex', () => {
+        const test = key => {
+          instance.apis = [
+            {
+              operationIds: {
+                rename: [
+                  {
+                    type: key,
+                    from: /^get(.*)/,
+                    to: 'renamed$1',
+                  },
+                ],
+              },
+            },
+          ];
+
+          instance.renameOperationIds();
+          expect(instance.schemas[0].paths["/test/path/first"].get.operationId).to.equal('renamedFirst');
+        };
+
+        test('regex');
+        test('regexp');
+      })
     });
 
     describe('renameTags()', () => {
