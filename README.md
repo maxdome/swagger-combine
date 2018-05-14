@@ -85,6 +85,20 @@ $ swagger-combine config.json
 $ swagger-combine config.json -o combinedSchema.json
 ```
 
+#### YAML Output
+
+The output is in YAML if the output filename ends with `.yaml` or `.yml`:
+
+```sh
+$ swagger-combine config.json -o combinedSchema.yaml
+```
+
+Alternatively the `--format` or `-f` argument can be used:
+
+```sh
+$ swagger-combine config.json -f yaml
+```
+
 ## Configuration
 
 * **Swagger Combine** requires one configuration schema which resembles a standard Swagger schema except for an additional `apis` field.

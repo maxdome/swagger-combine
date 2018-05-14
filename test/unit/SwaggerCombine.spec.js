@@ -7,7 +7,7 @@ const expect = chai.expect;
 
 const { SwaggerCombine } = require('../../src');
 
-const sandbox = sinon.sandbox.create();
+const sandbox = sinon.createSandbox();
 let instance;
 
 describe('[Unit] SwaggerCombine.js', () => {
@@ -867,7 +867,7 @@ describe('[Unit] SwaggerCombine.js', () => {
       });
 
       it('returns stringified combined schema', () => {
-        expect(instance.toString()).to.equal('{"test":"test","testTwo":["test"]}');
+        expect(instance.toString()).to.equal(JSON.stringify(instance.combinedSchema, null, 2));
       });
 
       it('returns YAML string if specified', () => {
