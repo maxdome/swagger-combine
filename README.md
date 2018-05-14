@@ -79,6 +79,12 @@ const app = require('express')();
 $ swagger-combine config.json
 ```
 
+#### Help
+
+```sh
+$ swagger-combine -h
+```
+
 #### Save to File
 
 ```sh
