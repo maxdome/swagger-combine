@@ -30,6 +30,11 @@ describe('[Unit] cli.js', () => {
     expect(CLI).to.be.a('function');
   });
 
+  it('returns version with `-v`', () => {
+    CLI(['-v']);
+  expect(consoleInfoStub).to.have.been.calledWith(sinon.match(/^v.*/));
+  });
+
   it('returns usage info with `-h`', () => {
     CLI(['-h']);
     expect(consoleInfoStub).to.have.been.calledWith(sinon.match.string);

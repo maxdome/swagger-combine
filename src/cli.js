@@ -2,6 +2,7 @@ const minimist = require('minimist');
 const fs = require('fs');
 
 const SwaggerCombine = require('./SwaggerCombine');
+const pkg = require('../package.json');
 
 function CLI(argv) {
   const args = minimist(argv);
@@ -9,6 +10,11 @@ function CLI(argv) {
   const output = args.output || args.o;
   const format = args.format || args.f;
   const opts = {};
+
+  if (args.v) {
+    console.info(`v${pkg.version}`);
+    return;
+  }
 
   if (args.h) {
     console.info('Usage: swagger-combine <config> [-o|--output file] [-f|--format <yaml|json>] [--continueOnError] [--continueOnConflictingPaths]');
