@@ -1,32 +1,38 @@
 const minimist = require('minimist');
 const fs = require('fs');
 
-const swaggerCombine = require('.');
+const SwaggerCombine = require('./SwaggerCombine');
 
 function CLI(argv) {
   const args = minimist(argv);
   const config = args._[0];
+  const output = args.output || args.o;
+  const format = args.format || args.f;
+  const opts = {};
 
   if (args.h) {
-    console.log('Usage: swagger-combine <config> [-o|--output file]')
+    console.info('Usage: swagger-combine <config> [-o|--output file] [-f|--format <yaml|json>]');
     return;
   }
 
   if (!config) {
-    console.log('No config file in arguments');
+    console.info('No config file in arguments');
     return;
   }
 
-  return swaggerCombine(config)
-    .then(schema => {
-      const output = args.output || args.o;
-      
+  if ((output && /\.ya?ml$/i.test(output)) || (format && /ya?ml/i.test(format))) {
+    opts.format = 'yaml';
+  }
+
+  return new SwaggerCombine(config, opts)
+    .combine()
+    .then(combinedSchema => {
       if (output) {
-        fs.writeFileSync(output, JSON.stringify(schema, null, 2));
+        fs.writeFileSync(output, combinedSchema.toString());
         return;
       }
 
-      console.log(schema);
+      console.info(combinedSchema.toString());
     })
     .catch(console.error);
 }

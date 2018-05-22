@@ -472,7 +472,7 @@ class SwaggerCombine {
       return $RefParser.YAML.stringify(this.combinedSchema);
     }
 
-    return JSON.stringify(this.combinedSchema);
+    return JSON.stringify(this.combinedSchema, null, 2);
   }
 }
 

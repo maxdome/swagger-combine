@@ -3,7 +3,7 @@ const http = require('http');
 const sinon = require('sinon');
 chai.use(require('sinon-chai'));
 const expect = chai.expect;
-const sandbox = sinon.sandbox.create();
+const sandbox = sinon.createSandbox();
 
 const Middleware = require('../../src/middleware');
 const { middleware, middlewareAsync, sendResponse } = Middleware;

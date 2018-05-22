@@ -1,26 +1,29 @@
 const chai = require('chai');
 const sinon = require('sinon');
-const mock = require('mock-require');
 const fs = require('fs');
 chai.use(require('sinon-chai'));
 const expect = chai.expect;
+const SwaggerCombine = require('../../src/SwaggerCombine');
 
 describe('[Unit] cli.js', () => {
   const testSchema = { test: '1' };
-  const swaggerCombineMock = sinon.stub().resolves(testSchema);
-  let swaggerCombine;
-  let consoleLogStub;
+  const expectedYamlOutput = "test: '1'\n";
+  const expectedJsonOutput = JSON.stringify(testSchema, null, 2);
+  let combineStub;
+  let consoleInfoStub;
   let consoleErrorStub;
   let fsWriteFileSyncStub;
   let CLI;
 
   beforeEach(() => {
-    mock('../../src', swaggerCombineMock);
-    swaggerCombine = mock.reRequire('../../src');
     CLI = require('../../src/cli');
-    consoleLogStub = sinon.stub(console, 'log');
+    combineStub = sinon.stub(SwaggerCombine.prototype, 'combine').callsFake(function(a, b, c) {
+      this.combinedSchema = testSchema;
+      return Promise.resolve(this);
+    });
+    consoleInfoStub = sinon.stub(console, 'info');
     consoleErrorStub = sinon.stub(console, 'error');
-    fsWriteFileSyncStub = sinon.stub(fs, 'writeFileSync')
+    fsWriteFileSyncStub = sinon.stub(fs, 'writeFileSync');
   });
 
   it('is a function', () => {
@@ -28,44 +31,67 @@ describe('[Unit] cli.js', () => {
   });
 
   it('returns usage info with `-h`', () => {
-    CLI(['-h'])
-    expect(consoleLogStub).to.have.been.calledWith('Usage: swagger-combine <config> [-o|--output file]')
+    CLI(['-h']);
+    expect(consoleInfoStub).to.have.been.calledWith(sinon.match.string);
   });
 
   it('returns info message if config is missing', () => {
-    CLI([])
-    expect(consoleLogStub).to.have.been.calledWith('No config file in arguments')
+    CLI([]);
+    expect(consoleInfoStub).to.have.been.calledWith('No config file in arguments');
   });
 
-  it('logs schema by default', () => {
-    return CLI(['test.json']).then(() => {
-      expect(consoleLogStub).to.have.been.calledWith(testSchema)
-    })
-  });
+  it('logs JSON schema by default', () =>
+    CLI(['test.json']).then(() => {
+      expect(consoleInfoStub).to.have.been.calledWith(expectedJsonOutput);
+    }));
 
-  it('writes file with `-o` or `--output`', () => {
+  it('logs YAML schema with format argument set to `yaml` or `yml`', () =>
+    Promise.all([
+      CLI(['test.json', '-f', 'yaml']),
+      CLI(['test.json', '-f', 'yml']),
+      CLI(['test.json', '--format', 'yaml']),
+      CLI(['test.json', '--format', 'yml']),
+    ]).then(() => {
+      expect(consoleInfoStub)
+        .to.have.callCount(4)
+        .and.have.always.been.calledWith(expectedYamlOutput);
+    }));
+
+  it('writes JSON to file with `-o` or `--output`', () => {
     const testOutputFilename = 'testOutput.json';
+
     return Promise.all([
-      CLI(['test.json', '-o', testOutputFilename]).then(() => {
-        expect(fsWriteFileSyncStub).to.have.been.calledWith(testOutputFilename, JSON.stringify(testSchema, null, 2))
-      }),
-      CLI(['test.json', '--output', testOutputFilename]).then(() => {
-        expect(fsWriteFileSyncStub).to.have.been.calledWith(testOutputFilename, JSON.stringify(testSchema, null, 2))
-      })
-    ])
+      CLI(['test.json', '-o', testOutputFilename]),
+      CLI(['test.json', '--output', testOutputFilename]),
+    ]).then(() => {
+      expect(fsWriteFileSyncStub).to.have.been.calledTwice.and.have.always.been.calledWith(
+        testOutputFilename,
+        expectedJsonOutput
+      );
+    });
   });
+
+  it('writes YAML to file with output filename ending with `yaml` or `yml`', () =>
+    Promise.all([
+      CLI(['test.json', '-o', 'testOutput.yaml']).then(() => {
+        expect(fsWriteFileSyncStub).to.have.been.calledWith('testOutput.yaml', expectedYamlOutput);
+      }),
+      CLI(['test.json', '--output', 'testOutput.yml']).then(() => {
+        expect(fsWriteFileSyncStub).to.have.been.calledWith('testOutput.yml', expectedYamlOutput);
+      }),
+    ]));
 
   it('logs error message on error', () => {
     const error = new Error('test error');
-    swaggerCombineMock.rejects(error)
+    combineStub.rejects(error);
     return CLI(['test.json']).then(() => {
-      expect(consoleErrorStub).to.have.been.calledWith(error)
-    })
+      expect(consoleErrorStub).to.have.been.calledWith(error);
+    });
   });
 
   afterEach(() => {
-    mock.stop('../../src');
-    consoleLogStub.restore();
+    combineStub.restore();
+    consoleInfoStub.restore();
     consoleErrorStub.restore();
     fsWriteFileSyncStub.restore();
   });
