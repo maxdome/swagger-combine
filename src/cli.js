@@ -11,7 +11,7 @@ function CLI(argv) {
   const opts = {};
 
   if (args.h) {
-    console.info('Usage: swagger-combine <config> [-o|--output file] [-f|--format <yaml|json>]');
+    console.info('Usage: swagger-combine <config> [-o|--output file] [-f|--format <yaml|json>] [--continueOnError] [--continueOnConflictingPaths]');
     return;
   }
 
@@ -23,6 +23,9 @@ function CLI(argv) {
   if ((output && /\.ya?ml$/i.test(output)) || (format && /ya?ml/i.test(format))) {
     opts.format = 'yaml';
   }
+
+  opts.continueOnError = !!args.continueOnError;
+  opts.continueOnConflictingPaths = !!args.continueOnConflictingPaths;
 
   return new SwaggerCombine(config, opts)
     .combine()

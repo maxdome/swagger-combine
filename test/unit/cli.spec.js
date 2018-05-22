@@ -80,6 +80,30 @@ describe('[Unit] cli.js', () => {
         expect(fsWriteFileSyncStub).to.have.been.calledWith('testOutput.yml', expectedYamlOutput);
       }),
     ]));
+  
+  it('sets format option', done => {
+    combineStub.callsFake(function() {
+      expect(this.opts.format).to.eql('yaml');
+      done()
+    });
+    CLI(['test.json', '-f', 'yaml']);
+  });
+  
+  it('sets continueOnError option', done => {
+    combineStub.callsFake(function() {
+      expect(this.opts.continueOnError).to.be.true;
+      done()
+    });
+    CLI(['test.json', '--continueOnError']);
+  });
+
+  it('sets continueOnConflictingPaths option', done => {
+    combineStub.callsFake(function() {
+      expect(this.opts.continueOnConflictingPaths).to.be.true;
+      done()
+    });
+    CLI(['test.json', '--continueOnConflictingPaths']);
+  });
 
   it('logs error message on error', () => {
     const error = new Error('test error');
