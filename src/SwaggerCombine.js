@@ -69,7 +69,7 @@ class SwaggerCombine {
         );
       })
       .then(apis => {
-        this.schemas = apis;
+        this.schemas = apis.filter(api => !!api);
         return this;
       });
   }

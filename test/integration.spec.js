@@ -51,6 +51,14 @@ describe('[Integration] SwaggerCombine.js', () => {
     return swaggerCombine(basicConfig, { continueOnError: true });
   });
 
+  it('catches errors if `continueOnError` option is set to true and a swagger config is unreachable for extended api config', () => {
+    nock('https://api.apis.guru')
+      .get('/v2/specs/deutschebahn.com/betriebsstellen/v1/swagger.json')
+      .reply(500);
+
+    return swaggerCombine(basicConfig, { continueOnError: true });
+  });
+
   it('catches errors if `continueOnError` option is set to true and a swagger config is invalid', () => {
     nock('http://petstore.swagger.io')
       .get('/v2/swagger.json')
