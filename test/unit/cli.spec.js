@@ -32,7 +32,7 @@ describe('[Unit] cli.js', () => {
 
   it('returns version with `-v`', () => {
     CLI(['-v']);
-  expect(consoleInfoStub).to.have.been.calledWith(sinon.match(/^v.*/));
+    expect(consoleInfoStub).to.have.been.calledWith(sinon.match(/^v.*/));
   });
 
   it('returns usage info with `-h`', () => {
@@ -85,19 +85,19 @@ describe('[Unit] cli.js', () => {
         expect(fsWriteFileSyncStub).to.have.been.calledWith('testOutput.yml', expectedYamlOutput);
       }),
     ]));
-  
+
   it('sets format option', done => {
     combineStub.callsFake(function() {
       expect(this.opts.format).to.eql('yaml');
-      done()
+      done();
     });
     CLI(['test.json', '-f', 'yaml']);
   });
-  
+
   it('sets continueOnError option', done => {
     combineStub.callsFake(function() {
       expect(this.opts.continueOnError).to.be.true;
-      done()
+      done();
     });
     CLI(['test.json', '--continueOnError']);
   });
@@ -105,9 +105,17 @@ describe('[Unit] cli.js', () => {
   it('sets continueOnConflictingPaths option', done => {
     combineStub.callsFake(function() {
       expect(this.opts.continueOnConflictingPaths).to.be.true;
-      done()
+      done();
     });
     CLI(['test.json', '--continueOnConflictingPaths']);
+  });
+
+  it('sets includeDefinitions option', done => {
+    combineStub.callsFake(function() {
+      expect(this.opts.includeDefinitions).to.be.true;
+      done();
+    });
+    CLI(['test.json', '--includeDefinitions']);
   });
 
   it('logs error message on error', () => {

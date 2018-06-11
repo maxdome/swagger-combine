@@ -524,14 +524,14 @@ describe('[Unit] SwaggerCombine.js', () => {
           {
             operationIds: {
               rename: {
-                'getFirst': 'getFirstRenamed'
+                getFirst: 'getFirstRenamed',
               },
             },
           },
         ];
 
         instance.renameOperationIds();
-        expect(instance.schemas[0].paths["/test/path/first"].get.operationId).to.equal('getFirstRenamed');
+        expect(instance.schemas[0].paths['/test/path/first'].get.operationId).to.equal('getFirstRenamed');
       });
 
       it('renames operationId by rename', () => {
@@ -543,14 +543,14 @@ describe('[Unit] SwaggerCombine.js', () => {
                   type: 'rename',
                   from: 'getFirst',
                   to: 'getFirstRenamed',
-                }
+                },
               ],
             },
           },
         ];
 
         instance.renameOperationIds();
-        expect(instance.schemas[0].paths["/test/path/first"].get.operationId).to.equal('getFirstRenamed');
+        expect(instance.schemas[0].paths['/test/path/first'].get.operationId).to.equal('getFirstRenamed');
       });
 
       it('renames operationId by regex (string)', () => {
@@ -569,7 +569,7 @@ describe('[Unit] SwaggerCombine.js', () => {
         ];
 
         instance.renameOperationIds();
-        expect(instance.schemas[0].paths["/test/path/first"].get.operationId).to.equal('renamedFirst');
+        expect(instance.schemas[0].paths['/test/path/first'].get.operationId).to.equal('renamedFirst');
       });
 
       it('renames operationId by regex', () => {
@@ -589,12 +589,12 @@ describe('[Unit] SwaggerCombine.js', () => {
           ];
 
           instance.renameOperationIds();
-          expect(instance.schemas[0].paths["/test/path/first"].get.operationId).to.equal('renamedFirst');
+          expect(instance.schemas[0].paths['/test/path/first'].get.operationId).to.equal('renamedFirst');
         };
 
         test('regex');
         test('regexp');
-      })
+      });
     });
 
     describe('renameTags()', () => {
@@ -775,156 +775,223 @@ describe('[Unit] SwaggerCombine.js', () => {
     });
 
     describe('combineSchemas()', () => {
-      it('combines schema paths', () => {
-        instance.schemas.push({
-          paths: {
-            '/schematwo/test': {
-              get: {
-                summary: 'GET /schematwo/test',
+      describe('paths', () => {
+        it('combines schema paths', () => {
+          instance.schemas.push({
+            paths: {
+              '/schematwo/test': {
+                get: {
+                  summary: 'GET /schematwo/test',
+                },
               },
             },
-          },
+          });
+
+          instance.combineSchemas();
+          expect(Object.keys(instance.combinedSchema.paths)).to.have.lengthOf(3);
+          expect(instance.combinedSchema.paths).to.have.all.keys([
+            '/test/path/first',
+            '/test/path/second',
+            '/schematwo/test',
+          ]);
         });
 
-        instance.combineSchemas();
-        expect(Object.keys(instance.combinedSchema.paths)).to.have.lengthOf(3);
-        expect(instance.combinedSchema.paths).to.have.all.keys([
-          '/test/path/first',
-          '/test/path/second',
-          '/schematwo/test',
-        ]);
-      });
-
-      it('combines schema security definitions', () => {
-        instance.schemas.push({
-          securityDefinitions: {
-            schema_two_auth: {
-              type: 'apiKey',
-            },
-          },
-        });
-
-        instance.combineSchemas();
-        expect(Object.keys(instance.combinedSchema.securityDefinitions)).to.have.length(3);
-        expect(instance.combinedSchema.securityDefinitions).to.have.all.keys([
-          'test_auth',
-          'test_schema_auth',
-          'schema_two_auth',
-        ]);
-      });
-
-      it('throws an error if path name already exists', () => {
-        instance.schemas.push({
-          paths: {
-            '/test/path/first': {
-              get: {
-                summary: 'GET /test/path/first duplicate',
+        it('throws an error if path name already exists', () => {
+          instance.schemas.push({
+            paths: {
+              '/test/path/first': {
+                get: {
+                  summary: 'GET /test/path/first duplicate',
+                },
               },
             },
-          },
+          });
+
+          expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in paths: \/test\/path\/first/);
         });
 
-        expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in paths: \/test\/path\/first/);
-      });
-
-      it('throws an error if path name already exists and opts propery continueOnConflictingPaths is true and there are duplicate operations', () => {
-        instance.opts = { continueOnConflictingPaths: true };
-        instance.schemas.push({
-          paths: {
-            '/test/path/first': {
-              get: {
-                summary: 'GET /test/path/first duplicate',
+        it('throws an error if path name already exists and opts propery continueOnConflictingPaths is true and there are duplicate operations', () => {
+          instance.opts = { continueOnConflictingPaths: true };
+          instance.schemas.push({
+            paths: {
+              '/test/path/first': {
+                get: {
+                  summary: 'GET /test/path/first duplicate',
+                },
+              },
+              '/test/path/second': {
+                get: {
+                  summary: 'GET /test/path/first duplicate',
+                },
               },
             },
-            '/test/path/second': {
-              get: {
-                summary: 'GET /test/path/first duplicate',
+          });
+
+          expect(instance.combineSchemas.bind(instance)).to.satisfy(msg => {
+            if (
+              expect(msg).to.throw(/Name conflict in paths: \/test\/path\/first at operation: get/) ||
+              expect(msg).to.throw(/Name conflict in paths: \/test\/path\/second at operation: get/)
+            ) {
+              return true;
+            } else {
+              return false;
+            }
+          });
+        });
+
+        it('accepts duplicate path names if opts propery continueOnConflictingPaths is true and there are not duplicate operations', () => {
+          instance.opts = { continueOnConflictingPaths: true };
+          instance.schemas.push({
+            paths: {
+              '/test/path/first': {
+                patch: {
+                  summary: 'PATCH /test/path/first',
+                },
               },
             },
-          },
-        });
+          });
 
-        expect(instance.combineSchemas.bind(instance)).to.satisfy(msg => {
-          if (
-            expect(msg).to.throw(/Name conflict in paths: \/test\/path\/first at operation: get/) ||
-            expect(msg).to.throw(/Name conflict in paths: \/test\/path\/second at operation: get/)
-          ) {
-            return true;
-          } else {
-            return false;
-          }
+          expect(instance.combineSchemas.bind(instance)).to.not.throw(
+            /Name conflict in paths: \/test\/path\/first at operation: patch/
+          );
         });
       });
 
-      it('accepts duplicate path names if opts propery continueOnConflictingPaths is true and there are not duplicate operations', () => {
-        instance.opts = { continueOnConflictingPaths: true };
-        instance.schemas.push({
-          paths: {
-            '/test/path/first': {
-              patch: {
-                summary: 'PATCH /test/path/first',
+      describe('securityDefinitions', () => {
+        it('combines schema security definitions', () => {
+          instance.schemas.push({
+            securityDefinitions: {
+              schema_two_auth: {
+                type: 'apiKey',
               },
             },
-          },
+          });
+
+          instance.combineSchemas();
+          expect(Object.keys(instance.combinedSchema.securityDefinitions)).to.have.length(3);
+          expect(instance.combinedSchema.securityDefinitions).to.have.all.keys([
+            'test_auth',
+            'test_schema_auth',
+            'schema_two_auth',
+          ]);
         });
 
-        expect(instance.combineSchemas.bind(instance)).to.not.throw(
-          /Name conflict in paths: \/test\/path\/first at operation: patch/
-        );
-      });
-
-      it('throws an error if security defintion name with a different configuration already exists', () => {
-        instance.schemas.push({
-          securityDefinitions: {
-            test_auth: {
-              type: 'apiKey_2',
-            },
-          },
-        });
-
-        expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in security definitions: test_auth/);
-      });
-
-      it('accepts identical security defintions with the same name', () => {
-        instance.schemas.push({
-          securityDefinitions: {
-            test_auth: {
-              type: 'apiKey',
-            },
-          },
-        });
-
-        expect(instance.combineSchemas.bind(instance)).to.not.throw(/Name conflict in security definitions: test_auth/);
-      });
-
-      it('accepts different operationIds', () => {
-        instance.schemas.push({
-          paths: {
-            '/test/path/third': {
-              get: {
-                summary: 'GET /test/path/third',
-                operationId: 'getThird',
+        it('throws an error if security definition name with a different configuration already exists', () => {
+          instance.schemas.push({
+            securityDefinitions: {
+              test_auth: {
+                type: 'apiKey_2',
               },
             },
-          },
+          });
+
+          expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in security definitions: test_auth/);
         });
 
-        expect(instance.combineSchemas.bind(instance)).to.not.throw(/OperationID conflict: getThird/);
-      });
-
-      it('throws an error if an operationId is not unique', () => {
-        instance.schemas.push({
-          paths: {
-            '/test/path/third': {
-              get: {
-                summary: 'GET /test/path/third',
-                operationId: 'getFirst',
+        it('accepts identical security defintions with the same name', () => {
+          instance.schemas.push({
+            securityDefinitions: {
+              test_auth: {
+                type: 'apiKey',
               },
             },
-          },
+          });
+
+          expect(instance.combineSchemas.bind(instance)).to.not.throw(
+            /Name conflict in security definitions: test_auth/
+          );
+        });
+      });
+
+      describe('operationIds', () => {
+        it('accepts different operationIds', () => {
+          instance.schemas.push({
+            paths: {
+              '/test/path/third': {
+                get: {
+                  summary: 'GET /test/path/third',
+                  operationId: 'getThird',
+                },
+              },
+            },
+          });
+
+          expect(instance.combineSchemas.bind(instance)).to.not.throw(/OperationID conflict: getThird/);
         });
 
-        expect(instance.combineSchemas.bind(instance)).to.throw(/OperationID conflict: getFirst/);
+        it('throws an error if an operationId is not unique', () => {
+          instance.schemas.push({
+            paths: {
+              '/test/path/third': {
+                get: {
+                  summary: 'GET /test/path/third',
+                  operationId: 'getFirst',
+                },
+              },
+            },
+          });
+
+          expect(instance.combineSchemas.bind(instance)).to.throw(/OperationID conflict: getFirst/);
+        });
+      });
+
+      describe('definitions if option `includeDefinitions` is true', () => {
+        beforeEach(() => {
+          instance.schemas.push({
+            definitions: {
+              TestExample: {
+                type: 'object',
+                properties: {
+                  id: {
+                    type: 'integer',
+                  },
+                },
+              },
+            },
+          });
+          instance.opts.includeDefinitions = true;
+        });
+
+        it('combines schema definitions', () => {
+          instance.combineSchemas();
+          expect(instance.combinedSchema.definitions).to.be.ok;
+          expect(Object.keys(instance.combinedSchema.definitions)).to.have.length(1);
+          expect(instance.combinedSchema.definitions).to.have.all.keys(['TestExample']);
+        });
+
+        it('throws an error if a defintion name already exists', () => {
+          instance.schemas.push({
+            definitions: {
+              TestExample: {
+                type: 'object',
+                properties: {
+                  name: {
+                    type: 'string',
+                  },
+                },
+              },
+            },
+          });
+
+          expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in definitions: TestExample/);
+        });
+
+        it('accepts identical defintions with the same name', () => {
+          instance.schemas.push({
+            definitions: {
+              TestExample: {
+                type: 'object',
+                properties: {
+                  id: {
+                    type: 'integer',
+                  },
+                },
+              },
+            },
+          });
+
+          expect(instance.combineSchemas.bind(instance)).to.not.throw(/Name conflict in definitions: TestExample/);
+        });
       });
     });
 

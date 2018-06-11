@@ -178,34 +178,38 @@ class SwaggerCombine {
 
   renameOperationIds() {
     this.schemas = this.schemas.map((schema, idx) => {
-        if (this.apis[idx].operationIds && this.apis[idx].operationIds.rename && Object.keys(this.apis[idx].operationIds.rename).length > 0) {
-            let renamings;
+      if (
+        this.apis[idx].operationIds &&
+        this.apis[idx].operationIds.rename &&
+        Object.keys(this.apis[idx].operationIds.rename).length > 0
+      ) {
+        let renamings;
 
-            if (_.isPlainObject(this.apis[idx].operationIds.rename)) {
-                renamings = [];
-                _.forIn(this.apis[idx].operationIds.rename, (renameOperationId, operationIdToRename) => {
-                    renamings.push({
-                        type: 'rename',
-                        from: operationIdToRename,
-                        to: renameOperationId,
-                    });
-                });
-            } else {
-                renamings = this.apis[idx].operationIds.rename;
-            }
-
-            _.forEach(renamings, renaming => {
-              const rename = this.rename.bind(this);
-              traverse(schema).forEach(function traverseSchema() {
-                if (this.key === 'operationId') {
-                  const newName = rename(renaming, this.node);
-                  this.update(newName);
-                }
-              });
+        if (_.isPlainObject(this.apis[idx].operationIds.rename)) {
+          renamings = [];
+          _.forIn(this.apis[idx].operationIds.rename, (renameOperationId, operationIdToRename) => {
+            renamings.push({
+              type: 'rename',
+              from: operationIdToRename,
+              to: renameOperationId,
+            });
           });
+        } else {
+          renamings = this.apis[idx].operationIds.rename;
         }
 
-        return schema;
+        _.forEach(renamings, renaming => {
+          const rename = this.rename.bind(this);
+          traverse(schema).forEach(function traverseSchema() {
+            if (this.key === 'operationId') {
+              const newName = rename(renaming, this.node);
+              this.update(newName);
+            }
+          });
+        });
+      }
+
+      return schema;
     });
 
     return this;
@@ -454,6 +458,21 @@ class SwaggerCombine {
       operationIds.push.apply(operationIds, newOperationIds);
 
       _.defaultsDeep(this.combinedSchema, _.pick(schema, ['paths', 'securityDefinitions']));
+
+      if (this.opts.includeDefinitions) {
+        const conflictingDefinitions = _.intersection(
+          _.keys(this.combinedSchema.definitions),
+          _.keys(_.get(schema, 'definitions'))
+        ).filter(
+          key => !_.isEqual(_.get(schema, `definitions.${key}`), _.get(this, `combinedSchema.definitions.${key}`))
+        );
+
+        if (!_.isEmpty(conflictingDefinitions)) {
+          throw new Error(`Name conflict in definitions: ${conflictingDefinitions.join(', ')}`);
+        }
+
+        _.defaultsDeep(this.combinedSchema, _.pick(schema, ['definitions']));
+      }
     });
 
     return this;
