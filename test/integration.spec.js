@@ -69,6 +69,16 @@ describe('[Integration] SwaggerCombine.js', () => {
     return swaggerCombine(basicConfig, { continueOnError: true });
   });
 
+  it('filters api definitions to match filtered schemas', () => {
+    nock('http://petstore.swagger.io')
+      .get('/v2/swagger.json')
+      .reply(500);
+
+    return swaggerCombine(basicConfig, { continueOnError: true }).then(schema => {
+      expect(schema.paths['/bahn/betriebsstellen']).to.not.be.undefined;
+    });
+  });
+
   it('filters out excluded paths', () =>
     swaggerCombine(filterConfig).then(schema => {
       expect(schema.paths['/pet'].put).to.not.be.ok;
