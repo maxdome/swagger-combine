@@ -995,6 +995,59 @@ describe('[Unit] SwaggerCombine.js', () => {
       });
     });
 
+    describe('parameters if option `includeParameters` is true', () => {
+      beforeEach(() => {
+        instance.schemas.push({
+          parameters: {
+            CommonPathParameterHeader: {
+              name: 'COMMON-PARAMETER-HEADER',
+              type: 'string',
+              in: 'header',
+              required: true,
+            },
+          },
+        });
+        instance.opts.includeParameters = true;
+      });
+
+      it('combines schema parameters', () => {
+        instance.combineSchemas();
+        expect(instance.combinedSchema.parameters).to.be.ok;
+        expect(Object.keys(instance.combinedSchema.parameters)).to.have.length(1);
+        expect(instance.combinedSchema.parameters).to.have.all.keys(['CommonPathParameterHeader']);
+      });
+
+      it('throws an error if a parameters name already exists', () => {
+        instance.schemas.push({
+          parameters: {
+            CommonPathParameterHeader: {
+              name: 'COMMON-PARAMETER-HEADER',
+              type: 'integer',
+              in: 'header',
+              required: true,
+            },
+          },
+        });
+
+        expect(instance.combineSchemas.bind(instance)).to.throw(/Name conflict in parameters: CommonPathParameterHeader/);
+      });
+
+      it('accepts identical parameters with the same name', () => {
+        instance.schemas.push({
+          parameters: {
+            CommonPathParameterHeader: {
+              name: 'COMMON-PARAMETER-HEADER',
+              type: 'string',
+              in: 'header',
+              required: true,
+            },
+          },
+        });
+
+        expect(instance.combineSchemas.bind(instance)).to.not.throw(/Name conflict in parameters: CommonPathParameterHeader/);
+      });
+    });
+
     describe('removeEmptyFields()', () => {
       it('removes empty fields', () => {
         instance.combinedSchema.empty = '';
