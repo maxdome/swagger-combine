@@ -461,22 +461,31 @@ class SwaggerCombine {
       _.defaultsDeep(this.combinedSchema, _.pick(schema, ['paths', 'securityDefinitions']));
 
       if (this.opts.includeDefinitions) {
-        const conflictingDefinitions = _.intersection(
-          _.keys(this.combinedSchema.definitions),
-          _.keys(_.get(schema, 'definitions'))
-        ).filter(
-          key => !_.isEqual(_.get(schema, `definitions.${key}`), _.get(this, `combinedSchema.definitions.${key}`))
-        );
-
-        if (!_.isEmpty(conflictingDefinitions)) {
-          throw new Error(`Name conflict in definitions: ${conflictingDefinitions.join(', ')}`);
-        }
-
-        _.defaultsDeep(this.combinedSchema, _.pick(schema, ['definitions']));
+        this.includeTerm(schema, 'definitions');
       }
+
+      if (this.opts.includeParameters) {
+        this.includeTerm(schema, 'parameters');
+      }
+
     });
 
     return this;
+  }
+
+  includeTerm(schema, term) {
+    const conflictingTerms = _.intersection(
+      _.keys(this.combinedSchema[term]),
+      _.keys(_.get(schema, term))
+    ).filter(
+      key => !_.isEqual(_.get(schema, `${term}.${key}`), _.get(this, `combinedSchema.${term}.${key}`))
+    );
+
+    if (!_.isEmpty(conflictingTerms)) {
+      throw new Error(`Name conflict in ${term}: ${conflictingTerms.join(', ')}`);
+    }
+
+    _.defaultsDeep(this.combinedSchema, _.pick(schema, [term]));
   }
 
   removeEmptyFields() {
