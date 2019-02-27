@@ -64,7 +64,7 @@
     "mock-require": "^3.0.2",
     "nock": "^10.0.1",
     "nyc": "^12.0.2",
-    "sinon": "^6.0.0",
+    "sinon": "^7.2.5",
     "sinon-chai": "^3.0.0"
   },
   "directories": {
