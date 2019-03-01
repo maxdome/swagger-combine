@@ -389,6 +389,35 @@ Tags can be renamed in the same manner as paths with simple, object like configu
 }
 ```
 
+### Renaming Path OperationIds
+
+When merging different swagger definitions there are situations were the operationIds used in these separate swaggers could collide. If this is the case and changing source isn't desired or possible. OperationIds can be renamed by specifying the existing id to rename and the new id as key/value pairs in `operationIds.rename`.
+
+This will replace each operationId matched by the provided key with the new value.
+
+```json
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Swagger Combine Simple OperationId Rename Example",
+    "version": "1.0.0"
+  },
+  "apis": [
+    {
+      "url": "http://petstore.swagger.io/v2/swagger.json",
+      "operationIds": {
+        "rename": {
+          "addPet": "createPet"
+        }
+      }
+    },
+    {
+      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+    }
+  ]
+}
+```
+
 ### Adding Tags
 
 Tags can be added to all operations in a schema, using the `tags.add` field.
