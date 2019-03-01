@@ -46,7 +46,10 @@ function CLI(argv) {
 
       console.info(combinedSchema.toString());
     })
-    .catch(console.error);
+    .catch(error => {
+      console.error(error)
+      process.exit(1);
+    });
 }
 
 module.exports = CLI;
