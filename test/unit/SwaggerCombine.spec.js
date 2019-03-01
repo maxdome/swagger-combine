@@ -277,7 +277,7 @@ describe('[Unit] SwaggerCombine.js', () => {
         instance.apis = [
           {
             paths: {
-              exclude: [/.*?/first/],
+              exclude: ['.*?/first'],
             },
           },
         ];
