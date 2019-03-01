@@ -47,7 +47,7 @@ function CLI(argv) {
       console.info(combinedSchema.toString());
     })
     .catch(error => {
-      console.error(error)
+      console.error(error.message)
       process.exit(1);
     });
 }

@@ -10,6 +10,7 @@ describe('[Unit] cli.js', () => {
   const expectedYamlOutput = "test: '1'\n";
   const expectedJsonOutput = JSON.stringify(testSchema, null, 2);
   let combineStub;
+  let processExitStub;
   let consoleInfoStub;
   let consoleErrorStub;
   let fsWriteFileSyncStub;
@@ -21,6 +22,7 @@ describe('[Unit] cli.js', () => {
       this.combinedSchema = testSchema;
       return Promise.resolve(this);
     });
+    processExitStub = sinon.stub(process, 'exit');
     consoleInfoStub = sinon.stub(console, 'info');
     consoleErrorStub = sinon.stub(console, 'error');
     fsWriteFileSyncStub = sinon.stub(fs, 'writeFileSync');
@@ -122,12 +124,21 @@ describe('[Unit] cli.js', () => {
     const error = new Error('test error');
     combineStub.rejects(error);
     return CLI(['test.json']).then(() => {
-      expect(consoleErrorStub).to.have.been.calledWith(error);
+      expect(consoleErrorStub).to.have.been.calledWith(error.message);
+    });
+  });
+
+  it('exits process with error code on error', () => {
+    const error = new Error('test error');
+    combineStub.rejects(error);
+    return CLI(['test.json']).then(() => {
+      expect(processExitStub).to.have.been.calledWith(1);
     });
   });
 
   afterEach(() => {
     combineStub.restore();
+    processExitStub.restore();
     consoleInfoStub.restore();
     consoleErrorStub.restore();
     fsWriteFileSyncStub.restore();
