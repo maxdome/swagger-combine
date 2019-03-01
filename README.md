@@ -161,7 +161,7 @@ apis:
 
 ### Filtering Paths
 
-Paths can be filtered by using an array of paths to `exclude` or `include`.
+Paths can be filtered by using an array of paths and regex strings to `exclude` or `include`.
 
 ```json
 {
@@ -185,6 +185,37 @@ Paths can be filtered by using an array of paths to `exclude` or `include`.
       "paths": {
         "include": [
           "/users/{userId}/publications",
+          "/me.get"
+        ]
+      }
+    }
+  ]
+}
+```
+
+Example of using Regex Strings (in combination with path string)
+
+```json
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Swagger Combine Filter Example",
+    "version": "1.0.0"
+  },
+  "apis": [
+    {
+      "url": "http://petstore.swagger.io/v2/swagger.json",
+      "paths": {
+        "exclude": [
+          ".*\{petId\}"
+        ]
+      }
+    },
+    {
+      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml",
+      "paths": {
+        "include": [
+          ".*?/publications(/.*)?",
           "/me.get"
         ]
       }
