@@ -229,6 +229,20 @@ describe('[Unit] SwaggerCombine.js', () => {
         expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(1);
       });
 
+      it('filters included path via regex', () => {
+        instance.apis = [
+          {
+            paths: {
+              include: ['.*?/second'],
+            },
+          },
+        ];
+
+        instance.filterPaths();
+        expect(instance.schemas[0].paths).to.have.all.keys(['/test/path/second']);
+        expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(1);
+      });
+
       it('filters included method in path', () => {
         instance.apis = [
           {
@@ -250,6 +264,20 @@ describe('[Unit] SwaggerCombine.js', () => {
           {
             paths: {
               exclude: ['/test/path/first'],
+            },
+          },
+        ];
+
+        instance.filterPaths();
+        expect(instance.schemas[0].paths).to.not.have.keys('/test/path/first');
+        expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(1);
+      });
+
+      it('filters out excluded path via regex', () => {
+        instance.apis = [
+          {
+            paths: {
+              exclude: [/.*?/first/],
             },
           },
         ];

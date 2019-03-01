@@ -75,13 +75,21 @@ class SwaggerCombine {
       });
   }
 
+  matchInArray(string, expressions) {
+    return expressions.filter(obj => new RegExp(obj).test(string)).length != 0;
+  }
+
   filterPaths() {
     this.schemas = this.schemas.map((schema, idx) => {
       if (this.apis[idx].paths) {
         if (this.apis[idx].paths.include && this.apis[idx].paths.include.length > 0) {
-          schema.paths = _.pick(schema.paths, this.apis[idx].paths.include);
+          schema.paths = _.merge(
+            _.pick(schema.paths, this.apis[idx].paths.include), 
+            _.pickBy(schema.paths, (prop, path) => this.matchInArray(path, this.apis[idx].paths.include))
+          );
         } else if (this.apis[idx].paths.exclude && this.apis[idx].paths.exclude.length > 0) {
           schema.paths = _.omit(schema.paths, this.apis[idx].paths.exclude);
+          schema.paths = _.omitBy(schema.paths, (prop, path) => this.matchInArray(path, this.apis[idx].paths.exclude));
         }
       }
 
