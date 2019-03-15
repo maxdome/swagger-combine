@@ -1,6 +1,6 @@
 {
   "name": "swagger-combine",
-  "version": "0.19.0",
+  "version": "0.21.0",
   "description": "Combines multiple Swagger schemas into one dereferenced schema",
   "main": "src/index.js",
   "bin": {
