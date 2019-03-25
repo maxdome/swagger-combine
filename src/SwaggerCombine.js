@@ -83,13 +83,32 @@ class SwaggerCombine {
     this.schemas = this.schemas.map((schema, idx) => {
       if (this.apis[idx].paths) {
         if (this.apis[idx].paths.include && this.apis[idx].paths.include.length > 0) {
+          
+          // expand all includes into explicit "<path>.<method>" include instructions
+          const dotPaths = Object.keys(schema.paths)
+            .reduce((allDotPaths, currentPath) => {
+              allDotPaths.push(currentPath);
+              const methods = Object.keys(schema.paths[currentPath]).filter(method => operationTypes.includes(method));
+              return allDotPaths.concat(methods.map((method) => `${currentPath}.${method}`))
+            }, []);
+          const explicitIncludes = dotPaths.filter((dotPath) => this.matchInArray(dotPath, this.apis[idx].paths.include));
+
           schema.paths = _.merge(
-            _.pick(schema.paths, this.apis[idx].paths.include), 
-            _.pickBy(schema.paths, (prop, path) => this.matchInArray(path, this.apis[idx].paths.include))
+            _.pick(schema.paths, explicitIncludes), 
+            _.pickBy(schema.paths, (prop, path) => this.matchInArray(path, explicitIncludes))
           );
         } else if (this.apis[idx].paths.exclude && this.apis[idx].paths.exclude.length > 0) {
-          schema.paths = _.omit(schema.paths, this.apis[idx].paths.exclude);
-          schema.paths = _.omitBy(schema.paths, (prop, path) => this.matchInArray(path, this.apis[idx].paths.exclude));
+          // expand all excludes into explicit "<path>.<method>" exclude instructions
+          const dotPaths = Object.keys(schema.paths)
+            .reduce((allDotPaths, currentPath) => {
+              allDotPaths.push(currentPath);
+              const methods = Object.keys(schema.paths[currentPath]).filter(method => operationTypes.includes(method));
+              return allDotPaths.concat(methods.map((method) => `${currentPath}.${method}`))
+            }, []);
+          const explicitExcludes = dotPaths.filter((dotPath) => this.matchInArray(dotPath, this.apis[idx].paths.exclude));
+
+          schema.paths = _.omit(schema.paths, explicitExcludes);
+          schema.paths = _.omitBy(schema.paths, (prop, path) => this.matchInArray(path, explicitExcludes));
         }
       }
 

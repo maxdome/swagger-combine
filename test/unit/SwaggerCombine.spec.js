@@ -259,6 +259,22 @@ describe('[Unit] SwaggerCombine.js', () => {
         expect(Object.keys(instance.schemas[0].paths['/test/path/second'])).to.have.lengthOf(1);
       });
 
+      it('filters included mathod in path via regex ', () => {
+        instance.apis = [
+          {
+            paths: {
+              include: ['.*?/second.get'],
+            },
+          },
+        ];
+
+        instance.filterPaths();
+        expect(instance.schemas[0].paths).to.have.all.keys(['/test/path/second']);
+        expect(instance.schemas[0].paths['/test/path/second']).to.have.all.keys(['get']);
+        expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(1);
+        expect(Object.keys(instance.schemas[0].paths['/test/path/second'])).to.have.lengthOf(1);
+      });
+
       it('filters out excluded path', () => {
         instance.apis = [
           {
@@ -292,6 +308,21 @@ describe('[Unit] SwaggerCombine.js', () => {
           {
             paths: {
               exclude: ['/test/path/first.get'],
+            },
+          },
+        ];
+
+        instance.filterPaths();
+        expect(instance.schemas[0].paths['/test/path/first']).to.not.have.keys('get');
+        expect(Object.keys(instance.schemas[0].paths['/test/path/first'])).to.have.lengthOf(2);
+        expect(Object.keys(instance.schemas[0].paths)).to.have.lengthOf(2);
+      });
+
+      it('filters out excluded mathod in path via regex ', () => {
+        instance.apis = [
+          {
+            paths: {
+              exclude: ['.*?first.get'],
             },
           },
         ];
