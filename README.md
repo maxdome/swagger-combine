@@ -207,7 +207,7 @@ Example of using Regex Strings (in combination with path string)
       "url": "http://petstore.swagger.io/v2/swagger.json",
       "paths": {
         "exclude": [
-          ".*\{petId\}"
+          ".*\{petId\}.get"
         ]
       }
     },

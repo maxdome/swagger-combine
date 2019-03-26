@@ -12,7 +12,7 @@ const config = (module.exports = {
     {
       url: 'http://petstore.swagger.io/v2/swagger.json',
       paths: {
-        include: ['.*\{petId\}']
+        include: ['.*\{petId\}.get']
       },
     },
     {
