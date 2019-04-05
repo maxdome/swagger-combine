@@ -105,6 +105,13 @@ Alternatively the `--format` or `-f` argument can be used:
 $ swagger-combine config.json -f yaml
 ```
 
+#### Watch Source Files and Recombine On Change
+
+```sh
+$ swagger-combine config.json -o combinedSchema.json -w
+```
+
+
 ## Configuration
 
 * **Swagger Combine** requires one configuration schema which resembles a standard Swagger schema except for an additional `apis` field.

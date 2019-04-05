@@ -13,6 +13,7 @@ class SwaggerCombine {
     this.apis = [];
     this.schemas = [];
     this.combinedSchema = {};
+    this.parsers = [];
   }
 
   combine() {
@@ -36,7 +37,9 @@ class SwaggerCombine {
   }
 
   load() {
-    return $RefParser
+    var parser = new $RefParser();
+    this.parsers.push(parser);
+    return parser
       .dereference(this.config, this.opts)
       .then(configSchema => {
         this.apis = configSchema.apis || [];
@@ -54,11 +57,16 @@ class SwaggerCombine {
               _.set(opts, 'resolve.http.headers.authorization', basicAuth);
             }
 
-            return $RefParser
+            var parser = new $RefParser();
+            this.parsers.push(parser);
+            return parser
               .dereference(api.url, opts)
               .then(res => SwaggerParser.dereference(res, opts))
               .catch(err => {
-                if (this.opts.continueOnError) {
+                if (this.opts.watch) {
+                  console.info('Error in file ', api.url);
+                  return;
+                } else if (this.opts.continueOnError) {
                   return;
                 }
 

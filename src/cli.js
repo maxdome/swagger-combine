@@ -9,6 +9,7 @@ function CLI(argv) {
   const config = args._[0];
   const output = args.output || args.o;
   const format = args.format || args.f;
+  const watch = args.watch || args.w;
   const opts = {};
 
   if (args.v) {
@@ -18,7 +19,7 @@ function CLI(argv) {
 
   if (args.h) {
     console.info(
-      'Usage: swagger-combine <config> [-o|--output file] [-f|--format <yaml|json>] [--continueOnError] [--continueOnConflictingPaths] [--includeDefinitions]'
+      'Usage: swagger-combine <config> [-o|--output file] [-f|--format <yaml|json>] [--continueOnError] [--continueOnConflictingPaths] [--includeDefinitions] [-w|--watch]'
     );
     return;
   }
@@ -35,16 +36,39 @@ function CLI(argv) {
   opts.continueOnError = !!args.continueOnError;
   opts.continueOnConflictingPaths = !!args.continueOnConflictingPaths;
   opts.includeDefinitions = !!args.includeDefinitions;
+  opts.watch = watch;
 
-  return new SwaggerCombine(config, opts)
+  var combiner = new SwaggerCombine(config, opts);
+  return combiner
     .combine()
     .then(combinedSchema => {
       if (output) {
         fs.writeFileSync(output, combinedSchema.toString());
-        return;
+      } else {
+        console.info(combinedSchema.toString());
       }
+      if (opts.watch) {
+        var paths = [];
+        combiner.parsers.map(parser => {
+          paths = paths.concat(parser.$refs.paths("file"));
+        });
+        var watch = require('node-watch');
+        var watchers = [];
 
-      console.info(combinedSchema.toString());
+        var fileChangeHandler = function onFileChange(evt, name) {
+          console.log('%s changed.', name);
+          watchers.map(watcher => {watcher.close();});
+          CLI(argv);
+        };
+
+        var distinctFilesToWatch = new Set(paths);
+        distinctFilesToWatch.forEach(path => {
+          watchers.push(watch(path, { recursive: false }, fileChangeHandler));
+          console.debug("Watching", path);
+        });
+
+        process.stdin.resume();
+      }
     })
     .catch(error => {
       console.error(error.message)
