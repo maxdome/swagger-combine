@@ -772,6 +772,34 @@ describe('[Unit] SwaggerCombine.js', () => {
         instance.addBasePath();
         expect(Object.keys(instance.schemas[0].paths).every(path => /^\/base\/.*/.test(path))).to.be.ok;
       });
+      it('use basePath from sub api defintions', () => {
+        // add schema with base path
+        instance.schemas.push(
+          {
+            basePath: '/base1',
+            paths: {
+              '/test/path/first': {
+                get: {
+                  summary: 'GET /test/path/first',
+                  operationId: 'getFirst',
+                  parameters: [
+                    {
+                      name: 'testParam',
+                      in: 'query',
+                    }               
+                  ],
+                }
+              }
+            }
+          });
+        // add api config with useBasePath
+        instance.apis.push({},{
+            useBasePath: true
+          });
+        expect(instance.schemas.length).to.equal(instance.apis.length);
+        instance.addBasePath();
+        expect(Object.keys(instance.schemas[1].paths).every(path => /^\/base1\/.*/.test(path))).to.be.ok;
+      });
     });
 
     describe('combineSchemas()', () => {
@@ -947,7 +975,7 @@ describe('[Unit] SwaggerCombine.js', () => {
                   },
                 },
               },
-            },
+            },   
           });
           instance.opts.includeDefinitions = true;
         });

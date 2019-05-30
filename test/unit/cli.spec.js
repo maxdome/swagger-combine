@@ -120,6 +120,14 @@ describe('[Unit] cli.js', () => {
     CLI(['test.json', '--includeDefinitions']);
   });
 
+  it('sets useBasePath option', done => {
+    combineStub.callsFake(function() {
+      expect(this.opts.useBasePath).to.be.true;
+      done();
+    });
+    CLI(['test.json', '--useBasePath']);
+  });
+
   it('logs error message on error', () => {
     const error = new Error('test error');
     combineStub.rejects(error);

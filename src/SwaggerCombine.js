@@ -394,19 +394,20 @@ class SwaggerCombine {
 
   addBasePath() {
     this.schemas = this.schemas.map((schema, idx) => {
-      // native basePath support for sub schema
-      // if a schema has a basePath defined, 
-      // combine the basePath with the route paths before merge
-      if (schema.basePath){
-        schema.paths = _.mapKeys(schema.paths, (value, curPath) => {
-          return urlJoin(schema.basePath, curPath);
-        });
-        delete schema.basePath;
-      }
       if (this.apis[idx].paths && this.apis[idx].paths.base) {
         schema.paths = _.mapKeys(schema.paths, (value, curPath) => {
           return urlJoin(this.apis[idx].paths.base, curPath);
         });
+      }else{
+        // native basePath support for sub schema
+        // if a schema has a basePath defined, 
+        // combine the basePath with the route paths before merge
+        if ((this.opts.useBasePath || !!this.apis[idx].useBasePath) && schema.basePath){
+          schema.paths = _.mapKeys(schema.paths, (value, curPath) => {
+            return urlJoin(schema.basePath, curPath);
+          });
+          delete schema.basePath;
+        }
       }
 
       return schema;
