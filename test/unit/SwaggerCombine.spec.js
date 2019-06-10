@@ -794,7 +794,9 @@ describe('[Unit] SwaggerCombine.js', () => {
           });
         // add api config with useBasePath
         instance.apis.push({},{
-            useBasePath: true
+            paths: {
+              useBasePath: true
+            }
           });
         expect(instance.schemas.length).to.equal(instance.apis.length);
         instance.addBasePath();

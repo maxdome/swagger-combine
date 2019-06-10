@@ -399,10 +399,10 @@ class SwaggerCombine {
           return urlJoin(this.apis[idx].paths.base, curPath);
         });
       }else{
-        // native basePath support for sub schema
-        // if a schema has a basePath defined, 
-        // combine the basePath with the route paths before merge
-        if ((this.opts.useBasePath || !!this.apis[idx].useBasePath) && schema.basePath){
+        /* native basePath support for sub schema
+         if a schema has a basePath defined, 
+         combine the basePath with the route paths before merge */
+        if ((this.opts.useBasePath || (this.apis[idx].paths && !!this.apis[idx].paths.useBasePath) && schema.basePath)){
           schema.paths = _.mapKeys(schema.paths, (value, curPath) => {
             return urlJoin(schema.basePath, curPath);
           });
