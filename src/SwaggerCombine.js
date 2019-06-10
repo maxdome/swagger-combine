@@ -75,13 +75,25 @@ class SwaggerCombine {
       });
   }
 
+  matchInArray(string, expressions) {
+    return expressions.filter(obj => new RegExp(obj).test(string)).length != 0;
+  }
+
   filterPaths() {
     this.schemas = this.schemas.map((schema, idx) => {
       if (this.apis[idx].paths) {
         if (this.apis[idx].paths.include && this.apis[idx].paths.include.length > 0) {
-          schema.paths = _.pick(schema.paths, this.apis[idx].paths.include);
+          const explicitIncludes = this.expandRegexPathMethod(schema, this.apis[idx].paths.include);
+
+          schema.paths = _.merge(
+            _.pick(schema.paths, explicitIncludes), 
+            _.pickBy(schema.paths, (prop, path) => this.matchInArray(path, explicitIncludes))
+          );
         } else if (this.apis[idx].paths.exclude && this.apis[idx].paths.exclude.length > 0) {
-          schema.paths = _.omit(schema.paths, this.apis[idx].paths.exclude);
+          const explicitExcludes = this.expandRegexPathMethod(schema, this.apis[idx].paths.exclude);
+
+          schema.paths = _.omit(schema.paths, explicitExcludes);
+          schema.paths = _.omitBy(schema.paths, (prop, path) => this.matchInArray(path, explicitExcludes));
         }
       }
 
@@ -494,6 +506,18 @@ class SwaggerCombine {
       .omitBy(_.isEmpty)
       .value();
     return this;
+  }
+
+  // Expand `pathMatchList` into a set of defined path.method strings that exist in `schema`
+  expandRegexPathMethod(schema, pathMatchList) {
+    const dotPaths = Object.keys(schema.paths)
+      .reduce((allDotPaths, currentPath) => {
+        allDotPaths.push(currentPath);
+        const methods = Object.keys(schema.paths[currentPath]).filter(method => operationTypes.includes(method));
+        return allDotPaths.concat(methods.map((method) => `${currentPath}.${method}`));
+      }, []);
+    const explicitIncludes = dotPaths.filter((dotPath) => this.matchInArray(dotPath, pathMatchList));
+    return explicitIncludes;
   }
 
   toString(format = this.opts.format) {
