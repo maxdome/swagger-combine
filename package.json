@@ -71,7 +71,7 @@
     "example": "examples"
   },
   "engines": {
-    "node": ">=7.6.0"
+    "node": ">=8"
   },
   "nyc": {
     "exclude": [
