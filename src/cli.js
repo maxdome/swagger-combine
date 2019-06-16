@@ -35,6 +35,7 @@ function CLI(argv) {
   opts.continueOnError = !!args.continueOnError;
   opts.continueOnConflictingPaths = !!args.continueOnConflictingPaths;
   opts.includeDefinitions = !!args.includeDefinitions;
+  opts.useBasePath = !!args.useBasePath;
 
   return new SwaggerCombine(config, opts)
     .combine()

@@ -265,6 +265,54 @@ Parameters can be filtered by specifying the path and the parameter name as to `
 }
 ```
 
+### Base Path
+
+The base path for each Swagger schema can be set by `base`:
+
+```json
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Basic Swagger Combine Example",
+    "version": "1.0.0"
+  },
+  "apis": [
+    {
+      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+    },
+    {
+      "url": "https://api.apis.guru/v2/specs/deutschebahn.com/betriebsstellen/v1/swagger.json",
+      "paths": {
+        "base": "/bahn"
+      }
+    }
+  ]
+}
+```
+
+Base path definition in Swagger schemas is ignored by default and the processing can be enabled individually by setting `useBasePath`. When enabled, the base path and path information is combinded during processing. The option can also be enabled in general (see below). If `base` is set, the `useBasePath` is ignored. 
+
+```json
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Swagger Combine simple Rename Example",
+    "version": "1.0.0"
+  },
+  "apis": [
+    {
+      "url": "http://petstore.swagger.io/v2/swagger.json",
+      "paths": {
+        "useBasePath": true
+      }
+    },
+    {
+      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+    }
+  ]
+}
+```
+
 ### Renaming Paths
 
 Paths can be renamed by specifying the path to rename and the new path name as key/value pairs in `paths.rename`.
@@ -623,6 +671,9 @@ For all possible resolve options have a look at the [documentation of json-schem
     Continue if Swagger schemas have conflicting paths (default: `false`). An error is only thrown if conflicting paths also have conflicting operations (e.g. if two Swagger schemas both have `/pets.get` and `/pets.get` defined).
 
 > See [JSON Schema $Ref Parser Options](https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/options.md) for a complete list of options.
+
+* **useBasePath** - `boolean` (default:false)
+    The base path defintion in Swagger schemas is ignored by default. To respect the base path during combination, configure `useBasePath` in general or for individual Swagger schemas.
 
 #### callback `function(err, combinedSchema)` *(optional)*
 
