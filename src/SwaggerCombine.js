@@ -490,6 +490,10 @@ class SwaggerCombine {
         this.includeTerm(schema, 'parameters');
       }
 
+      if (this.opts.includeGlobalTags) {
+        this.includeTermArray(schema, 'tags', 'name');
+      }
+
     });
 
     return this;
@@ -508,6 +512,30 @@ class SwaggerCombine {
     }
 
     _.defaultsDeep(this.combinedSchema, _.pick(schema, [term]));
+  }
+
+  includeTermArray(schema, term, matchBy) {
+    if (!_.has(schema, term)) {
+      return
+    }
+
+    const conflictingTerms = _.intersectionBy(
+      this.combinedSchema[term] || [], 
+      _.get(schema, term),
+      matchBy
+    );
+
+    console.log(conflictingTerms);
+
+    if (!_.isEmpty(conflictingTerms)) {
+      throw new Error(`Name conflict in ${term}: ${conflictingTerms.join(', ')}`);
+    }
+
+    if (!_.has(this.combinedSchema, term)) {
+      _.defaultsDeep(this.combinedSchema, _.pick(schema, [term]));
+    } else {
+      this.combinedSchema[term] = this.combinedSchema[term].concat(_.get(schema, term));
+    }
   }
 
   removeEmptyFields() {

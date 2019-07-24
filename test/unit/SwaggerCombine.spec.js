@@ -90,6 +90,12 @@ describe('[Unit] SwaggerCombine.js', () => {
               type: 'apiKey',
             },
           },
+          tags: [
+            {
+              name: 'tag name',
+              description: 'tag description'
+            }
+          ]
         },
       ];
     });
@@ -1021,6 +1027,39 @@ describe('[Unit] SwaggerCombine.js', () => {
           });
 
           expect(instance.combineSchemas.bind(instance)).to.throw(/OperationID conflict: getFirst/);
+        });
+      });
+
+      describe('global tags at root level if option `includeGlobalTags` is true', () => {
+        beforeEach(() => {
+          instance.schemas.push({
+            tags: [
+              {
+                name: 'another tag name',
+                description: 'another tag description'
+              }
+            ],   
+          });
+          instance.opts.includeGlobalTags = true;
+        });
+
+        it('combines tags at root level', () => {
+          instance.combineSchemas();
+          expect(instance.combinedSchema.tags).to.be.ok;
+          expect(Object.keys(instance.combinedSchema.tags)).to.have.length(2);
+        })
+        
+        it('throws an error if a global tag name already exists', () => {
+          instance.schemas.push({
+            tags: [
+              {
+                name: 'another tag name',
+                description: 'another tag description'
+              }
+            ],   
+          });
+
+          expect(instance.combineSchemas.bind(instance)).to.throw();
         });
       });
 
