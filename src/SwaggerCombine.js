@@ -525,8 +525,6 @@ class SwaggerCombine {
       matchBy
     );
 
-    console.log(conflictingTerms);
-
     if (!_.isEmpty(conflictingTerms)) {
       throw new Error(`Name conflict in ${term}: ${conflictingTerms.join(', ')}`);
     }
