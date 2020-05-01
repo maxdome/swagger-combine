@@ -672,8 +672,13 @@ For all possible resolve options have a look at the [documentation of json-schem
 
 > See [JSON Schema $Ref Parser Options](https://github.com/BigstickCarpet/json-schema-ref-parser/blob/master/docs/options.md) for a complete list of options.
 
-* **useBasePath** - `boolean` (default:false)
+* **useBasePath** - `boolean` *(default: false)*
+
     The base path defintion in Swagger schemas is ignored by default. To respect the base path during combination, configure `useBasePath` in general or for individual Swagger schemas.
+
+* **includeGlobalTags** - `boolean` *(default: false)*
+
+    Combine global tags (set on the root level of the schemas) as well.
 
 #### callback `function(err, combinedSchema)` *(optional)*
 
