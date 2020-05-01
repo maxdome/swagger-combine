@@ -2,6 +2,7 @@ const $RefParser = require('json-schema-ref-parser');
 const SwaggerParser = require('swagger-parser');
 const traverse = require('traverse');
 const urlJoin = require('url-join');
+const YAML = require('js-yaml');
 const _ = require('lodash');
 
 const operationTypes = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch'];
@@ -558,7 +559,7 @@ class SwaggerCombine {
 
   toString(format = this.opts.format) {
     if (String(format).toLowerCase() === 'yaml' || String(format).toLowerCase() === 'yml') {
-      return $RefParser.YAML.stringify(this.combinedSchema);
+      return YAML.safeDump(this.combinedSchema);
     }
 
     return JSON.stringify(this.combinedSchema, null, 2);
