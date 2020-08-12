@@ -47,6 +47,7 @@ class SwaggerCombine {
           this.apis.map((api, idx) => {
             const opts = _.cloneDeep(this.opts);
             opts.resolve = Object.assign({}, opts.resolve, api.resolve);
+            opts.dereference = Object.assign({}, opts.dereference, api.dereference);
 
             if (_.has(opts, 'resolve.http.auth.username') && _.has(opts, 'resolve.http.auth.password')) {
               const basicAuth =
@@ -87,7 +88,7 @@ class SwaggerCombine {
           const explicitIncludes = this.expandRegexPathMethod(schema, this.apis[idx].paths.include);
 
           schema.paths = _.merge(
-            _.pick(schema.paths, explicitIncludes), 
+            _.pick(schema.paths, explicitIncludes),
             _.pickBy(schema.paths, (prop, path) => this.matchInArray(path, explicitIncludes))
           );
         } else if (this.apis[idx].paths.exclude && this.apis[idx].paths.exclude.length > 0) {
@@ -411,11 +412,11 @@ class SwaggerCombine {
         schema.paths = _.mapKeys(schema.paths, (value, curPath) => {
           return urlJoin(this.apis[idx].paths.base, curPath);
         });
-      }else{
+      } else {
         /* native basePath support for sub schema
          if a schema has a basePath defined, 
          combine the basePath with the route paths before merge */
-        if ((this.opts.useBasePath || (this.apis[idx].paths && !!this.apis[idx].paths.useBasePath) && schema.basePath)){
+        if (this.opts.useBasePath || (this.apis[idx].paths && !!this.apis[idx].paths.useBasePath && schema.basePath)) {
           schema.paths = _.mapKeys(schema.paths, (value, curPath) => {
             return urlJoin(schema.basePath, curPath);
           });
@@ -494,17 +495,13 @@ class SwaggerCombine {
       if (this.opts.includeGlobalTags) {
         this.includeTermArray(schema, 'tags', 'name');
       }
-
     });
 
     return this;
   }
 
   includeTerm(schema, term) {
-    const conflictingTerms = _.intersection(
-      _.keys(this.combinedSchema[term]),
-      _.keys(_.get(schema, term))
-    ).filter(
+    const conflictingTerms = _.intersection(_.keys(this.combinedSchema[term]), _.keys(_.get(schema, term))).filter(
       key => !_.isEqual(_.get(schema, `${term}.${key}`), _.get(this, `combinedSchema.${term}.${key}`))
     );
 
@@ -517,14 +514,10 @@ class SwaggerCombine {
 
   includeTermArray(schema, term, matchBy) {
     if (!_.has(schema, term)) {
-      return
+      return;
     }
 
-    const conflictingTerms = _.intersectionBy(
-      this.combinedSchema[term] || [], 
-      _.get(schema, term),
-      matchBy
-    );
+    const conflictingTerms = _.intersectionBy(this.combinedSchema[term] || [], _.get(schema, term), matchBy);
 
     if (!_.isEmpty(conflictingTerms)) {
       throw new Error(`Name conflict in ${term}: ${conflictingTerms.join(', ')}`);
@@ -547,13 +540,12 @@ class SwaggerCombine {
 
   // Expand `pathMatchList` into a set of defined path.method strings that exist in `schema`
   expandRegexPathMethod(schema, pathMatchList) {
-    const dotPaths = Object.keys(schema.paths)
-      .reduce((allDotPaths, currentPath) => {
-        allDotPaths.push(currentPath);
-        const methods = Object.keys(schema.paths[currentPath]).filter(method => operationTypes.includes(method));
-        return allDotPaths.concat(methods.map((method) => `${currentPath}.${method}`));
-      }, []);
-    const explicitIncludes = dotPaths.filter((dotPath) => this.matchInArray(dotPath, pathMatchList));
+    const dotPaths = Object.keys(schema.paths).reduce((allDotPaths, currentPath) => {
+      allDotPaths.push(currentPath);
+      const methods = Object.keys(schema.paths[currentPath]).filter(method => operationTypes.includes(method));
+      return allDotPaths.concat(methods.map(method => `${currentPath}.${method}`));
+    }, []);
+    const explicitIncludes = dotPaths.filter(dotPath => this.matchInArray(dotPath, pathMatchList));
     return explicitIncludes;
   }
 
