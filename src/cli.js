@@ -18,7 +18,7 @@ function CLI(argv) {
 
   if (args.h) {
     console.info(
-      'Usage: swagger-combine <config> [-o|--output file] [-f|--format <yaml|json>] [--continueOnError] [--continueOnConflictingPaths] [--includeDefinitions]'
+      'Usage: swagger-combine <config> [-o|--output file] [-f|--format <yaml|json>] [--continueOnError] [--continueOnConflictingPaths] [--includeDefinitions] [--includeGlobalTags]'
     );
     return;
   }
@@ -36,6 +36,7 @@ function CLI(argv) {
   opts.continueOnConflictingPaths = !!args.continueOnConflictingPaths;
   opts.includeDefinitions = !!args.includeDefinitions;
   opts.useBasePath = !!args.useBasePath;
+  opts.includeGlobalTags = !!args.includeGlobalTags;
 
   return new SwaggerCombine(config, opts)
     .combine()

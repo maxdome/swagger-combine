@@ -128,6 +128,14 @@ describe('[Unit] cli.js', () => {
     CLI(['test.json', '--useBasePath']);
   });
 
+  it('sets includeGlobalTags option', done => {
+    combineStub.callsFake(function() {
+      expect(this.opts.includeGlobalTags).to.be.true;
+      done();
+    });
+    CLI(['test.json', '--includeGlobalTags']);
+  });
+
   it('logs error message on error', () => {
     const error = new Error('test error');
     combineStub.rejects(error);
