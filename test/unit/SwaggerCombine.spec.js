@@ -176,7 +176,7 @@ describe('[Unit] SwaggerCombine.js', () => {
             expect(http.get).to.have.been.calledWithMatch(
               sinon.match({
                 headers: {
-                  authorization: sinon.match.string,
+                  authorization: 'Basic YWRtaW46c2VjcmV0MTIzNDU=',
                 },
               })
             );
