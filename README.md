@@ -6,7 +6,6 @@ Swagger Combine
 [![dependencies Status](https://david-dm.org/maxdome/swagger-combine/status.svg)](https://david-dm.org/maxdome/swagger-combine)
 [![devDependencies Status](https://david-dm.org/maxdome/swagger-combine/dev-status.svg)](https://david-dm.org/maxdome/swagger-combine?type=dev)
 [![npm](https://img.shields.io/npm/v/swagger-combine.svg)](https://www.npmjs.com/package/swagger-combine)
-[![Greenkeeper badge](https://badges.greenkeeper.io/maxdome/swagger-combine.svg)](https://greenkeeper.io/)
 
 >Combines multiple Swagger schemas into one dereferenced schema.
 
