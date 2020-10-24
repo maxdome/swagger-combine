@@ -52,7 +52,7 @@ class SwaggerCombine {
             if (_.has(opts, 'resolve.http.auth.username') && _.has(opts, 'resolve.http.auth.password')) {
               const basicAuth =
                 'Basic ' +
-                new Buffer(`${opts.resolve.http.auth.username}:${opts.resolve.http.auth.password}`).toString('base64');
+                Buffer.from(`${opts.resolve.http.auth.username}:${opts.resolve.http.auth.password}`).toString('base64');
               _.set(opts, 'resolve.http.headers.authorization', basicAuth);
             }
 
