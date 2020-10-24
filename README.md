@@ -2,6 +2,7 @@ Swagger Combine
 ===============
 
 [![Build Status](https://img.shields.io/github/workflow/status/maxdome/swagger-combine/Node.js%20CI/master.svg?style=flat-square)](https://github.com/maxdome/swagger-combine/actions?query=workflow%3A%22Node.js+CI%22)
+[![Coverage Status](https://coveralls.io/repos/github/maxdome/swagger-combine/badge.svg)](https://coveralls.io/github/maxdome/swagger-combine)
 [![dependencies Status](https://david-dm.org/maxdome/swagger-combine/status.svg)](https://david-dm.org/maxdome/swagger-combine)
 [![devDependencies Status](https://david-dm.org/maxdome/swagger-combine/dev-status.svg)](https://david-dm.org/maxdome/swagger-combine?type=dev)
 [![npm](https://img.shields.io/npm/v/swagger-combine.svg)](https://www.npmjs.com/package/swagger-combine)

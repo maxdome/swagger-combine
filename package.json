@@ -83,7 +83,7 @@
     ],
     "reporter": [
       "text",
-      "html"
+      "lcov"
     ]
   }
 }
