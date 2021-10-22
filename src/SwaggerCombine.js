@@ -551,7 +551,7 @@ class SwaggerCombine {
 
   toString(format = this.opts.format) {
     if (String(format).toLowerCase() === 'yaml' || String(format).toLowerCase() === 'yml') {
-      return YAML.safeDump(this.combinedSchema);
+      return YAML.dump(this.combinedSchema);
     }
 
     return JSON.stringify(this.combinedSchema, null, 2);
