@@ -42,12 +42,12 @@
   "homepage": "https://github.com/maxdome/swagger-combine#readme",
   "license": "MIT",
   "dependencies": {
+    "@apidevtools/json-schema-ref-parser": "^12.0.2",
+    "@apidevtools/swagger-parser": "^12.1.0",
     "call-me-maybe": "^1.0.1",
     "js-yaml": "^4.1.0",
-    "json-schema-ref-parser": "^9.0.9",
     "lodash": "^4.17.21",
     "minimist": "^1.2.5",
-    "swagger-parser": "^10.0.3",
     "traverse": "^0.6.6",
     "url-join": "^4.0.1"
   },

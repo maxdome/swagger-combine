@@ -1,5 +1,5 @@
-const $RefParser = require('json-schema-ref-parser');
-const SwaggerParser = require('swagger-parser');
+const $RefParser = require('@apidevtools/json-schema-ref-parser');
+const SwaggerParser = require('@apidevtools/swagger-parser');
 const traverse = require('traverse');
 const urlJoin = require('url-join');
 const YAML = require('js-yaml');
