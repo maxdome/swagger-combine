@@ -14,14 +14,6 @@ const config = (module.exports = {
           "pet"
         ]
       }
-    },
-    {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml",
-      "tags": {
-        "add": [
-          "medium"
-        ]
-      }
     }
   ]
 });

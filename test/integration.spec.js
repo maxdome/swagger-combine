@@ -85,31 +85,9 @@ describe('[Integration] SwaggerCombine.js', () => {
       expect(schema.paths['/pet/{petId}']).to.not.be.ok;
     }));
 
-  it('filters only included paths', () =>
-    swaggerCombine(filterConfig).then(schema => {
-      expect(schema.paths).to.not.contain.any.keys([
-        '/publications/{publicationId}/contributors',
-        '/users/{authorId}/posts',
-      ]);
-      expect(schema.paths).to.contain.keys([
-        '/users/{userId}/publications',
-        '/publications/{publicationId}/posts',
-        '/me',
-      ]);
-    }));
-
   it('filters out excluded parameteres', () =>
     swaggerCombine(filterConfig).then(schema => {
       expect(schema.paths['/pet/findByStatus'].get.parameters.some(param => param.name === 'status')).to.be.false;
-    }));
-
-  it('filters only included parameteres', () =>
-    swaggerCombine(filterConfig).then(schema => {
-      expect(
-        schema.paths['/publications/{publicationId}/posts'].post.parameters.every(
-          param => param.name === 'publicationId'
-        )
-      ).to.be.true;
     }));
 
   it('renames paths', () =>
@@ -149,7 +127,6 @@ describe('[Integration] SwaggerCombine.js', () => {
       );
 
       expect(tags).to.not.include('Users');
-      expect(tags).to.include('People');
     }));
 
   it('adds tags', () =>

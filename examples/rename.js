@@ -22,14 +22,6 @@ const config = (module.exports = {
         },
       },
     },
-    {
-      url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml',
-      tags: {
-        rename: {
-          Users: 'People',
-        },
-      },
-    },
   ],
 });
 

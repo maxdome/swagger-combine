@@ -14,13 +14,7 @@ const config = (module.exports = {
       paths: {
         include: ['.*\{petId\}.get']
       },
-    },
-    {
-      url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml',
-      paths: {
-        exclude: ['.*?/publications(/.*)?'],
-      },
-    },
+    }
   ],
 });
 

@@ -21,16 +21,6 @@ const config = (module.exports = {
       }
     },
     {
-      url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml',
-      resolve: {
-        http: {
-          headers: {
-            authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6ImFkbWluIiwiYWRtaW4iOnRydWV9.44lJS0jlltzcglq7vgjXMXYRTecBxseN3Dec_LO_osI'
-          }
-        }
-      }
-    },
-    {
       url: 'https://api.apis.guru/v2/specs/deutschebahn.com/betriebsstellen/v1/swagger.json',
       resolve: {
         http: {
