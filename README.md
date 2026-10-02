@@ -128,7 +128,7 @@ $ swagger-combine config.json -f yaml
       "url": "http://petstore.swagger.io/v2/swagger.json"
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml"
     },
     {
       "url": "https://api.apis.guru/v2/specs/deutschebahn.com/betriebsstellen/v1/swagger.json",
@@ -149,7 +149,7 @@ info:
   version: 1.0.0
 apis:
   - url: 'http://petstore.swagger.io/v2/swagger.json'
-  - url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml'
+  - url: 'https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml'
   - url: 'https://api.apis.guru/v2/specs/deutschebahn.com/betriebsstellen/v1/swagger.json'
     paths:
       base: '/bahn'
@@ -180,7 +180,7 @@ Paths can be filtered by using an array of paths and regex strings to `exclude` 
       }
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml",
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml",
       "paths": {
         "include": [
           "/users/{userId}/publications",
@@ -211,7 +211,7 @@ Example of using Regex Strings (in combination with path string)
       }
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml",
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml",
       "paths": {
         "include": [
           ".*?/publications(/.*)?",
@@ -246,7 +246,7 @@ Parameters can be filtered by specifying the path and the parameter name as to `
       }
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml",
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml",
       "paths": {
         "include": [
           "/users/{userId}/publications",
@@ -277,7 +277,7 @@ The base path for each Swagger schema can be set by `base`:
   },
   "apis": [
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml"
     },
     {
       "url": "https://api.apis.guru/v2/specs/deutschebahn.com/betriebsstellen/v1/swagger.json",
@@ -306,7 +306,7 @@ Base path definition in Swagger schemas is ignored by default and the processing
       }
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml"
     }
   ]
 }
@@ -334,7 +334,7 @@ This will replace each key matched by path with the new value.
       }
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml"
     }
   ]
 }
@@ -369,7 +369,7 @@ The next example equals the simple example above but used an extended configurat
       }
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml"
     }
   ]
 }
@@ -398,7 +398,7 @@ To change the basePath of all paths a regular expression can be used.
       }
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml"
     }
   ]
 }
@@ -431,7 +431,7 @@ const swaggerJson = {
       }
     },
     {
-      url: "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+      url: "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml"
     }
   ]
 }
@@ -456,7 +456,7 @@ Tags can be renamed in the same manner as paths with simple, object like configu
       "url": "http://petstore.swagger.io/v2/swagger.json"
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml",
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml",
       "tags": {
         "rename": {
           "Users": "People"
@@ -490,7 +490,7 @@ This will replace each operationId matched by the provided key with the new valu
       }
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml"
     }
   ]
 }
@@ -517,7 +517,7 @@ Tags can be added to all operations in a schema, using the `tags.add` field.
       }
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml",
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml",
       "tags": {
         "add": [
           "medium"
@@ -549,7 +549,7 @@ Security definitions can be renamed like paths (simple) and tags in the `securit
       }
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml"
     }
   ]
 }
@@ -587,7 +587,7 @@ Security can be specified per path using the `paths.security` field.
       }
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml"
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml"
     }
   ]
 }
@@ -617,7 +617,7 @@ To retrieve Swagger schemas that are access protected, basic auth information (u
       }
     },
     {
-      "url": "https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml",
+      "url": "https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml",
       "resolve": {
         "http": {
           "headers": {

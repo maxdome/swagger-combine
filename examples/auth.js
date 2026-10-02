@@ -21,7 +21,7 @@ const config = (module.exports = {
       }
     },
     {
-      url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml',
+      url: 'https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml',
       resolve: {
         http: {
           headers: {

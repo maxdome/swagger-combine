@@ -13,7 +13,7 @@ const config = (module.exports = {
       url: 'http://petstore.swagger.io/v2/swagger.json',
     },
     {
-      url: 'https://api.apis.guru/v2/specs/medium.com/1.0.0/swagger.yaml',
+      url: 'https://raw.githubusercontent.com/amardeshbd/medium-api-specification/master/medium-api-specification.yaml',
     },
     {
       url: 'https://api.apis.guru/v2/specs/deutschebahn.com/betriebsstellen/v1/swagger.json',
